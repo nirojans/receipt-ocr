@@ -39,15 +39,7 @@ public class ReciptOCRTest {
         pixDestroy(image);
 
 
-        String resourceName = "config.properties"; // could also be a constant
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        Properties props = new Properties();
-        try (InputStream resourceStream = loader.getResourceAsStream(resourceName)) {
-            props.load(resourceStream);
-            System.out.print(props.toString());
-        } catch (Exception e) {
 
-        }
     }
 
     public static String processReceipts() throws IOException, InterruptedException{
