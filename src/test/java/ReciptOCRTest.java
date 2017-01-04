@@ -11,7 +11,7 @@ import static org.bytedeco.javacpp.lept.*;
 import static org.bytedeco.javacpp.tesseract.*;
 import static org.junit.Assert.assertTrue;
 
-public class BasicTesseractExampleTest {
+public class ReciptOCRTest {
     
     @Test
     public void givenTessBaseApi_whenImageOcrd_thenTextDisplayed() throws Exception {
