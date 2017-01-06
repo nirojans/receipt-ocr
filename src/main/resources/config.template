@@ -1,0 +1,9 @@
+# formatType,value,expectedOccurence
+receipt_identifier=supermarket name
+receipt_identifier_line_range=4
+current_symbol=$
+line_item_identifier_start=where to start reading the line items
+line_item_start_line_range=NA
+line_item_identifier_end=where to start reading the line items
+line_item_end_line_range=NA
+total_identifier=total
