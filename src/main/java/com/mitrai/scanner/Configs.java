@@ -8,14 +8,15 @@ import java.util.Properties;
  */
 public class Configs {
 
+    private static final String CONFIG_FILE_NAME = "config.properties";
+
     public static Boolean getOSDetails() {
         String status = "true";
-        String resourceName = "config.properties"; // could also be a constant
+        String resourceName = CONFIG_FILE_NAME; // could also be a constant
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
         Properties props = new Properties();
         try (InputStream resourceStream = loader.getResourceAsStream(resourceName)) {
             props.load(resourceStream);
-            System.out.print(props.toString());
         } catch (Exception e) {
             System.out.println("Exception has occurred during the config reading phase");
         }
@@ -23,12 +24,11 @@ public class Configs {
     }
 
     public static Properties getFolderNames() {
-        String resourceName = "config.properties"; // could also be a constant
+        String resourceName = CONFIG_FILE_NAME;
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
         Properties props = new Properties();
         try (InputStream resourceStream = loader.getResourceAsStream(resourceName)) {
             props.load(resourceStream);
-            System.out.print(props.toString());
         } catch (Exception e) {
             System.out.println("Exception has occurred during the config reading phase");
         }
