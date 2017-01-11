@@ -8,11 +8,11 @@ import java.util.Properties;
  */
 public class Configs {
 
-    private static final String CONFIG_FILE_NAME = "config.properties";
+    public static final String CONFIG_FILE_NAME = "config.properties";
+    public static final String SUPER_MARKET_TEMPLATE_NAME = "template.properties";
 
-    public static Boolean getOSDetails() {
-        String status = "true";
-        String resourceName = CONFIG_FILE_NAME; // could also be a constant
+    public static Properties getConfigs(String fileName) {
+        String resourceName = fileName;
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
         Properties props = new Properties();
         try (InputStream resourceStream = loader.getResourceAsStream(resourceName)) {
@@ -20,7 +20,7 @@ public class Configs {
         } catch (Exception e) {
             System.out.println("Exception has occurred during the config reading phase");
         }
-        return true;
+        return props;
     }
 
     public static Properties getFolderNames() {

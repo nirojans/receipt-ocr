@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Properties;
 
 /**
@@ -33,13 +34,14 @@ public class FileHelper {
         resultsFolderPath = properties.getProperty("results_folder_path");
     }
 
-    public static BufferedReader readFile(String fileLocation) throws IOException{
+    public static String[] readFile(String fileLocation) throws IOException{
         BufferedReader br = new BufferedReader(new FileReader(fileLocation));
-//        String line;
-//        while ((line = br.readLine()) != null) {
-//            System.out.println(line);
-//        }
-        return br;
+        String line;
+        ArrayList<String> stringArrayList = new ArrayList<>();
+        while ((line = br.readLine()) != null) {
+            stringArrayList.add(line.trim());
+        }
+        return stringArrayList.toArray(new String[stringArrayList.size()]);
     }
 
     public static String getFileExtension(File file) {
@@ -51,18 +53,18 @@ public class FileHelper {
         }
     }
 
+    public static String getFileNameWithoutExtension(File file) {
+        String name = file.getName();
+        try {
+            return name.substring(0, name.lastIndexOf("."));
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
     public static File[] getAllFileNames() {
         File folder = new File(baseFolderPath + raw_image_folder_name);
-        File[] listOfFiles = folder.listFiles();
-
-//        for (int i = 0; i < listOfFiles.length; i++) {
-//            if (listOfFiles[i].isFile()) {
-//                System.out.println("File " + listOfFiles[i].getName());
-//            } else if (listOfFiles[i].isDirectory()) {
-//                System.out.println("Directory " + listOfFiles[i].getName());
-//            }
-//        }
-        return listOfFiles;
+        return folder.listFiles();
     }
 
     public static void initBaseFolder() {

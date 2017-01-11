@@ -10,22 +10,10 @@ public class TemplateEngine {
 
     public static String getRetaurantName() {
         try {
-            BufferedReader br = FileHelper.readFile("images/sharp_clean_resize_result.txt");
+            String[] br = FileHelper.readFile("images/sharp_clean_resize_result.txt");
 
             // Run a for loop, until we reach the Restaurant Name or the Max lines
-            String line;
-            while ((line = br.readLine()) != null) {
-                int distance = StringHelper.distance("TESCO",line);
-                if (distance == 0) {
-                    System.out.println("Super market has been found, the restaurant name is TESO");
-                    //System.out.println(line);
-                } else {
-                    System.out.println("not found in" + line);
-                }
 
-            }
-
-//            StringHelper.distance()
         } catch (IOException e) {
             e.printStackTrace();
         }

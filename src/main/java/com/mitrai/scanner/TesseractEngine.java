@@ -32,7 +32,6 @@ public class TesseractEngine {
         } catch (IOException e) {
             throw e;
         }
-        //FileHelper.readFile();
         return output.toString().isEmpty() ? "success" : "fail";
     }
 
