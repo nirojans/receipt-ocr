@@ -47,7 +47,7 @@ public class TesseractEngine {
         StringBuffer output = new StringBuffer();
         Process p;
         try {
-            p = Runtime.getRuntime().exec("tesseract images/test.png images/out");
+            p = Runtime.getRuntime().exec("sh text_clean_resize.sh images/dark_back_clear_receipt.jpeg");
             p.waitFor();
             BufferedReader reader =
                     new BufferedReader(new InputStreamReader(p.getInputStream()));
