@@ -1,7 +1,8 @@
 package com.mitrai.scanner;
 
+import org.apache.commons.io.FilenameUtils;
+
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
@@ -12,12 +13,12 @@ import static org.junit.Assert.assertTrue;
  */
 public class TesseractEngine {
 
-    public static String TerminalImplementation(String folderPath, String imageName, String extension) throws InterruptedException, IOException {
+    public static String TerminalImplementation(String command) throws InterruptedException, IOException {
 
         StringBuffer output = new StringBuffer();
         Process p;
         try {
-            p = Runtime.getRuntime().exec("tesseract " + folderPath + imageName + " " + folderPath + File.separator + "out");
+            p = Runtime.getRuntime().exec(command);
             p.waitFor();
             BufferedReader reader =
                     new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -34,4 +35,13 @@ public class TesseractEngine {
         //FileHelper.readFile();
         return output.toString().isEmpty() ? "success" : "fail";
     }
+
+    public static String getCommandForTesseract(String fileName, String scriptName) {
+        String command = "sh scripts/" + scriptName + " " + FileHelper.rawFolderPath + fileName + " " +
+                FilenameUtils.removeExtension(fileName) + " " + FileHelper.preprocessedFolderPath + " " + FileHelper.resultsFolderPath + " " + FileHelper.archivedFolderPath;
+        System.out.println(command);
+        return command;
+    }
+
+
 }

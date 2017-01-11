@@ -16,6 +16,7 @@ public class FileHelper {
     private static String preprocessed_image_folder_name = "preprocessed_images";
     private static String results_folder_name = "results";
 
+    public static String baseFolder = "";
     public static String baseFolderPath = "";
     public static String rawFolderPath = "";
     public static String archivedFolderPath = "";
@@ -24,6 +25,7 @@ public class FileHelper {
 
     static {
         Properties properties = Configs.getFolderNames();
+        baseFolderPath = properties.getProperty("base_folder");
         baseFolderPath = properties.getProperty("base_folder_path");
         rawFolderPath = properties.getProperty("raw_image_folder_path");
         archivedFolderPath = properties.getProperty("archived_image_folder_path");
@@ -53,13 +55,13 @@ public class FileHelper {
         File folder = new File(baseFolderPath + raw_image_folder_name);
         File[] listOfFiles = folder.listFiles();
 
-        for (int i = 0; i < listOfFiles.length; i++) {
-            if (listOfFiles[i].isFile()) {
-                System.out.println("File " + listOfFiles[i].getName());
-            } else if (listOfFiles[i].isDirectory()) {
-                System.out.println("Directory " + listOfFiles[i].getName());
-            }
-        }
+//        for (int i = 0; i < listOfFiles.length; i++) {
+//            if (listOfFiles[i].isFile()) {
+//                System.out.println("File " + listOfFiles[i].getName());
+//            } else if (listOfFiles[i].isDirectory()) {
+//                System.out.println("Directory " + listOfFiles[i].getName());
+//            }
+//        }
         return listOfFiles;
     }
 
