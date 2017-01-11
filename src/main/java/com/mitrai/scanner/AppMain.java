@@ -18,6 +18,12 @@ import static org.junit.Assert.assertTrue;
 public class AppMain {
 
     public static void main(String[] args){
+
+        // Initiate all the folders for batch processing
+        FileHelper.initBaseFolder();
+
+        // Call the schduler to process all images in raw folder
+
         System.out.print("hello this is from app main");
         TemplateEngine.getRetaurantName();
     }

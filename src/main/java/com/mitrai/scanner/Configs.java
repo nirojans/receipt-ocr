@@ -21,4 +21,17 @@ public class Configs {
         }
         return true;
     }
+
+    public static Properties getFolderNames() {
+        String resourceName = "config.properties"; // could also be a constant
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        Properties props = new Properties();
+        try (InputStream resourceStream = loader.getResourceAsStream(resourceName)) {
+            props.load(resourceStream);
+            System.out.print(props.toString());
+        } catch (Exception e) {
+            System.out.println("Exception has occurred during the config reading phase");
+        }
+        return props;
+    }
 }
