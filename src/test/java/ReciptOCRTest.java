@@ -21,6 +21,6 @@ public class ReciptOCRTest {
 //        TesseractEngine.TerminalImplementation();
 //        System.out.print("hello");
 //        getLineItems();
-        System.out.print("The results for " + StringHelper.distance("TESCO","tesco"));
+        TemplateEngine.getRetaurantName();
     }
 }

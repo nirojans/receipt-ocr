@@ -8,12 +8,12 @@ import java.io.IOException;
  */
 public class FileHelper {
 
-    public static BufferedReader readFile() throws IOException{
-        BufferedReader br = new BufferedReader(new FileReader("out.txt"));
-        String line;
-        while ((line = br.readLine()) != null) {
-            System.out.println(line);
-        }
+    public static BufferedReader readFile(String fileLocation) throws IOException{
+        BufferedReader br = new BufferedReader(new FileReader(fileLocation));
+//        String line;
+//        while ((line = br.readLine()) != null) {
+//            System.out.println(line);
+//        }
         return br;
     }
 

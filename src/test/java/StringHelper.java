@@ -34,7 +34,7 @@ public class StringHelper {
         }
     }
 
-    public static final double distance(final String s1, final String s2) {
+    public static final int distance(final String s1, final String s2) {
         if (s1.equals(s2)) {
             return 0;
         }
