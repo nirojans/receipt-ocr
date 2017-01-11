@@ -1,4 +1,4 @@
-import com.sun.org.apache.xpath.internal.operations.Bool;
+package com.mitrai.scanner;
 
 import java.io.InputStream;
 import java.util.Properties;

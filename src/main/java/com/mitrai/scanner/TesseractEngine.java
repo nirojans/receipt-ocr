@@ -1,3 +1,5 @@
+package com.mitrai.scanner;
+
 import org.bytedeco.javacpp.BytePointer;
 import org.bytedeco.javacpp.lept;
 import org.bytedeco.javacpp.tesseract;

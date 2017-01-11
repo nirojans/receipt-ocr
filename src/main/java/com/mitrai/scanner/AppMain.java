@@ -1,3 +1,4 @@
+package com.mitrai.scanner;
 import org.bytedeco.javacpp.*;
 import org.junit.Test;
 
@@ -14,9 +15,10 @@ import static org.bytedeco.javacpp.lept.*;
 import static org.bytedeco.javacpp.tesseract.*;
 import static org.junit.Assert.assertTrue;
 
-public class ReciptOCRTest {
+public class AppMain {
 
-    @Test
-    public void givenTessBaseApi_whenImageOcrd_thenTextDisplayed() throws Exception {
+    public static void main(String[] args){
+        System.out.print("hello this is from app main");
+        TemplateEngine.getRetaurantName();
     }
 }

@@ -1,3 +1,5 @@
+package com.mitrai.scanner;
+
 import java.util.ArrayList;
 
 /**

@@ -1,8 +1,7 @@
-import java.awt.geom.Point2D;
+package com.mitrai.scanner;
+
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
-import java.nio.channels.Pipe;
 
 /**
  * Created by niro273 on 1/4/17.
