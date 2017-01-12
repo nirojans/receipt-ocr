@@ -12,21 +12,32 @@ public class StringHelper {
 
     public static Receipt getLineItemsForReceipt(Receipt receipt, String regex) {
 
+        boolean firstLineItem = true;
+
         List<LineItem> lineItemList = new ArrayList<>();
         String[] inputStrings = receipt.getRawData();
         Pattern p = Pattern.compile(regex);
-        for (String inputString : inputStrings) {
+        for (int i=0; i < inputStrings.length; i++) {
+            String inputString = inputStrings[i];
             Matcher m = p.matcher(inputString);
             if (m.find()) {
-                String description  = m.group("description");
+
+                if (firstLineItem) {
+                    firstLineItem = false;
+                    receipt.setLineItemStartLine(i);
+                }
+                receipt.setLineItemEndLine(i);
+
+                String description  = m.group("description").trim();
                 String currency     = m.group("currency");
                 String amountString = m.group("amount");
 
-                System.out.format("Desciption: %s%n" + "Currency: %s%n" + "Amount: %s%n", description.trim() , currency, amountString);
+//                System.out.format("Description: %s%n" + "Currency: %s%n" + "Amount: %s%n", description.trim() , currency, amountString);
                 LineItem lineItem = new LineItem();
                 lineItem.setDescription(description);
                 lineItem.setCurrencySymbol(currency);
                 lineItem.setValue(amountString);
+                lineItem.setLineNumber(i);
 
                 lineItemList.add(lineItem);
             }

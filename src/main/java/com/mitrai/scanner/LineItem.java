@@ -5,11 +5,12 @@ package com.mitrai.scanner;
  */
 public class LineItem {
 
-    int accuracyLevel;
-    String description;
-    String units;
-    String value;
-    String currencySymbol;
+    private int accuracyLevel;
+    private String description;
+    private String units;
+    private String value;
+    private String currencySymbol;
+    private int lineNumber;
 
 
     public int getAccuracyLevel() {
@@ -50,5 +51,13 @@ public class LineItem {
 
     public void setCurrencySymbol(String currencySymbol) {
         this.currencySymbol = currencySymbol;
+    }
+
+    public int getLineNumber() {
+        return lineNumber;
+    }
+
+    public void setLineNumber(int lineNumber) {
+        this.lineNumber = lineNumber;
     }
 }

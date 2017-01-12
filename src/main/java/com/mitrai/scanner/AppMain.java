@@ -2,13 +2,13 @@ package com.mitrai.scanner;
 
 import org.apache.commons.io.FilenameUtils;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
+import static javax.script.ScriptEngine.FILENAME;
 import static org.junit.Assert.assertTrue;
 
 public class AppMain {
@@ -33,10 +33,9 @@ public class AppMain {
 //                    performPreProcessingAndOCR(fileName);
 
                     // read all text
-                    List<String[]> ocrResultsArrayList = getAllOCRResults(FileHelper.getFileNameWithoutExtension(listOfFiles[i]));
-                    List<Receipt> receiptList = new ArrayList<>();
-                    receiptList = identifySuperMarketName(receiptList, ocrResultsArrayList);
-
+                    List<Receipt> receiptList = getAllOCRResults(FileHelper.getFileNameWithoutExtension(listOfFiles[i]));
+                    receiptList = identifySuperMarketName(receiptList);
+                    identifyLineItems(receiptList);
 
                     // process receipt for restaurant name
 
@@ -52,16 +51,59 @@ public class AppMain {
         }
     }
 
+    public static void writeResultsToFile(Receipt receipt) {
+        String content = "";
+        String FILENAME = FileHelper.resultsFolderPath + "results.txt";
+
+        content = "Super Market Name : " + receipt.getRestaurantName() + " \n";
+
+        for (LineItem i : receipt.getLineItemses()) {
+            content +=  "Description : " + i.getDescription() + ". symbol : " + i.getCurrencySymbol() + ". value : "
+                    + i.getValue() + " Line number" + i.getLineNumber() + " \n";
+        }
+
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILENAME))) {
+            bw.write(content);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void identifyLineItems(List<Receipt> receiptList) {
+        String poundSymbol = "£|€";
+        String regex = "(?<description>.+)"
+                + "\\s{2,}"                             // two or more white space
+                + "(?<currency>"+poundSymbol+"|\\w)"    // Pound symbol may be mis-reaad
+                + "(?<amount>\\d+\\.\\d{2})";
+        for (Receipt r : receiptList) {
+            r = StringHelper.getLineItemsForReceipt(r, regex);
+            String name = " niro";
+        }
+
+
+        Collections.sort(receiptList, new Comparator<Receipt>(){
+            public int compare(Receipt r1, Receipt r2) {
+                return r1.getLineItemses().size() - r2.getLineItemses().size();
+            }
+        });
+
+        Receipt highReceipt = receiptList.get(receiptList.size()-1);
+        writeResultsToFile(highReceipt);
+    }
+
     public static String finalizeSuperMartketName() {
 
 
         return "";
     }
 
-    public static List<Receipt> identifySuperMarketName(List<Receipt> receiptList, List<String[]> stringsArrayList) {
+    public static List<Receipt> identifySuperMarketName(List<Receipt> receiptList) {
         Properties properties = Configs.getConfigs(Configs.SUPER_MARKET_TEMPLATE_NAME);
 
-        for (String[] ocrResults : stringsArrayList) {
+        for (Receipt receipt : receiptList) {
+
+            String[] ocrResults = receipt.getRawData();
             for(String key : properties.stringPropertyNames()) {
                 String templateName = properties.getProperty(key);
                 int[] scoreArrayForPreProcess = new int[ocrResults.length];
@@ -72,30 +114,32 @@ public class AppMain {
                         scoreArrayForPreProcess[j] = StringHelper.distance(templateName, ocrResults[j].toLowerCase());
                     }
                 }
-                Receipt receipt = new Receipt();
                 receipt.setRestaurantName(templateName);
                 Arrays.sort(scoreArrayForPreProcess);
                 receipt.setNameRecognitionRank(scoreArrayForPreProcess[0]);
-
-                receiptList.add(receipt);
             }
         }
         return receiptList;
     }
 
-    public static List<String[]> getAllOCRResults(String fileName) {
+    public static List<Receipt> getAllOCRResults(String fileName) {
 
-        List<String[]> stringArrayList = new ArrayList<>();
+        List<Receipt> receiptList = new ArrayList<>();
+//        List<String[]> stringArrayList = new ArrayList<>();
 
         try {
             for (int i=1;i<4;i++) {
-                stringArrayList.add(FileHelper.readFile(FileHelper.resultsFolderPath + FilenameUtils.removeExtension(fileName) + "_" + i));
+//                stringArrayList.add(FileHelper.readFile(FileHelper.resultsFolderPath + FilenameUtils.removeExtension(fileName) + "_" + i));
+                Receipt receipt = new Receipt();
+                receipt.setRawData(FileHelper.readFile(FileHelper.resultsFolderPath + FilenameUtils.removeExtension(fileName) + "_" + i));
+                receipt.setPreprocessMethod(i);
+                receiptList.add(receipt);
             }
         } catch (Exception e) {
             System.out.println("File not found for the OCR's results");
         }
 
-        return stringArrayList;
+        return receiptList;
     }
 
     public static void performPreProcessingAndOCR(String fileName) throws IOException, InterruptedException {

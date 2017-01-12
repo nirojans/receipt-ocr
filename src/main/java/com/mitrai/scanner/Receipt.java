@@ -15,6 +15,10 @@ public class Receipt {
     private String otherValues;
     private String[] rawData;
 
+    private int lineItemEndLine;
+    private int lineItemStartLine;
+    private int preprocessMethod;
+
     public String getRestaurantName() {
         return restaurantName;
     }
@@ -61,5 +65,29 @@ public class Receipt {
 
     public void setLineItemses(List<LineItem> lineItemses) {
         this.lineItemses = lineItemses;
+    }
+
+    public int getLineItemEndLine() {
+        return lineItemEndLine;
+    }
+
+    public void setLineItemEndLine(int lineItemEndLine) {
+        this.lineItemEndLine = lineItemEndLine;
+    }
+
+    public int getLineItemStartLine() {
+        return lineItemStartLine;
+    }
+
+    public void setLineItemStartLine(int lineItemStartLine) {
+        this.lineItemStartLine = lineItemStartLine;
+    }
+
+    public int getPreprocessMethod() {
+        return preprocessMethod;
+    }
+
+    public void setPreprocessMethod(int preprocessMethod) {
+        this.preprocessMethod = preprocessMethod;
     }
 }
