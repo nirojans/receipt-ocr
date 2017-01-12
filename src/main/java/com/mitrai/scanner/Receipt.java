@@ -8,9 +8,9 @@ import java.util.List;
  */
 public class Receipt {
 
-    private String restaurantName;
+    private String superMarketName;
     private int nameRecognitionRank;
-    private List<LineItem> lineItemses = new ArrayList<>();
+    private List<LineItem> lineItems = new ArrayList<>();
     private String date;
     private String otherValues;
     private String[] rawData;
@@ -19,12 +19,12 @@ public class Receipt {
     private int lineItemStartLine;
     private int preprocessMethod;
 
-    public String getRestaurantName() {
-        return restaurantName;
+    public String getSuperMarketName() {
+        return superMarketName;
     }
 
-    public void setRestaurantName(String restaurantName) {
-        this.restaurantName = restaurantName;
+    public void setSuperMarketName(String superMarketName) {
+        this.superMarketName = superMarketName;
     }
 
     public String getDate() {
@@ -59,12 +59,12 @@ public class Receipt {
         this.rawData = rawData;
     }
 
-    public List<LineItem> getLineItemses() {
-        return lineItemses;
+    public List<LineItem> getLineItems() {
+        return lineItems;
     }
 
-    public void setLineItemses(List<LineItem> lineItemses) {
-        this.lineItemses = lineItemses;
+    public void setLineItems(List<LineItem> lineItems) {
+        this.lineItems = lineItems;
     }
 
     public int getLineItemEndLine() {

@@ -32,7 +32,6 @@ public class StringHelper {
                 String currency     = m.group("currency");
                 String amountString = m.group("amount");
 
-//                System.out.format("Description: %s%n" + "Currency: %s%n" + "Amount: %s%n", description.trim() , currency, amountString);
                 LineItem lineItem = new LineItem();
                 lineItem.setDescription(description);
                 lineItem.setCurrencySymbol(currency);
@@ -42,12 +41,12 @@ public class StringHelper {
                 lineItemList.add(lineItem);
             }
         }
-        receipt.setLineItemses(lineItemList);
+        receipt.setLineItems(lineItemList);
         return receipt;
     }
 
 
-    public static void getLineItemsViaRegex(String[] array) {
+    public static void testMethodForRegexLineItems(String[] array) {
         String poundSymbol = "£";
         String[] inputStrings = {
                 "CHOC. ORANGE    x         " + poundSymbol + "1.00"
@@ -75,7 +74,10 @@ public class StringHelper {
         }
     }
 
-    public static final int distance(final String s1, final String s2) {
+    /*  This method is for String similarity computations (levenshtein distance)
+        If the words are same will give zero
+     */
+    public static int distance(final String s1, final String s2) {
         if (s1.equals(s2)) {
             return 0;
         }

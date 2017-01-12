@@ -6,12 +6,20 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import static org.junit.Assert.assertTrue;
-
 /**
  * Created by niro273 on 1/4/17.
  */
 public class TesseractEngine {
+
+    public static String method1ScriptName = "text_clean_resize.sh";
+    public static String method2ScriptName = "thresh_sharp.sh";
+    public static String method3ScriptName = "fill_sharp_clean.sh";
+
+    public static void performPreProcessingAndOCR(String fileName) throws IOException, InterruptedException {
+        TesseractEngine.TerminalImplementation(TesseractEngine.getCommandForTesseract(fileName, method1ScriptName));
+        TesseractEngine.TerminalImplementation(TesseractEngine.getCommandForTesseract(fileName, method2ScriptName));
+        TesseractEngine.TerminalImplementation(TesseractEngine.getCommandForTesseract(fileName, method3ScriptName));
+    }
 
     public static String TerminalImplementation(String command) throws InterruptedException, IOException {
 

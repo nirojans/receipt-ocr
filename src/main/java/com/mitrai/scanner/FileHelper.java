@@ -1,10 +1,15 @@
 package com.mitrai.scanner;
 
+import org.apache.commons.io.FilenameUtils;
+
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -81,6 +86,38 @@ public class FileHelper {
             preprocessed_image_directory.mkdirs();
             results_directory.mkdirs();
         }
-
     }
+
+
+    public static List<Receipt> readAllResultsForAImage(String fileName) {
+        List<Receipt> receiptList = new ArrayList<>();
+        try {
+            for (int i=1;i<4;i++) {
+                Receipt receipt = new Receipt();
+                receipt.setRawData(FileHelper.readFile(FileHelper.resultsFolderPath + FilenameUtils.removeExtension(fileName) + "_" + i));
+                receipt.setPreprocessMethod(i);
+                receiptList.add(receipt);
+            }
+        } catch (Exception e) {
+            System.out.println("File not found for the OCR's results");
+        }
+        return receiptList;
+    }
+
+    public static void writeResultsToFile(Receipt receipt, String resultsFileName) {
+        String FILENAME = FileHelper.resultsFolderPath + resultsFileName;
+        String content = "Super Market Name : " + receipt.getSuperMarketName() + " \n";
+
+        for (LineItem i : receipt.getLineItems()) {
+            content +=  "Description : " + i.getDescription() + ". symbol : " + i.getCurrencySymbol() + ". value : "
+                    + i.getValue() + " Line number" + i.getLineNumber() + " \n";
+        }
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILENAME))) {
+            bw.write(content);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
