@@ -1,5 +1,7 @@
 package com.mitrai.scanner;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -7,6 +9,32 @@ import java.util.regex.Pattern;
  * Created by niro273 on 1/6/17.
  */
 public class StringHelper {
+
+    public static Receipt getLineItemsForReceipt(Receipt receipt, String regex) {
+
+        List<LineItem> lineItemList = new ArrayList<>();
+        String[] inputStrings = receipt.getRawData();
+        Pattern p = Pattern.compile(regex);
+        for (String inputString : inputStrings) {
+            Matcher m = p.matcher(inputString);
+            if (m.find()) {
+                String description  = m.group("description");
+                String currency     = m.group("currency");
+                String amountString = m.group("amount");
+
+                System.out.format("Desciption: %s%n" + "Currency: %s%n" + "Amount: %s%n", description.trim() , currency, amountString);
+                LineItem lineItem = new LineItem();
+                lineItem.setDescription(description);
+                lineItem.setCurrencySymbol(currency);
+                lineItem.setValue(amountString);
+
+                lineItemList.add(lineItem);
+            }
+        }
+        receipt.setLineItemses(lineItemList);
+        return receipt;
+    }
+
 
     public static void getLineItemsViaRegex(String[] array) {
         String poundSymbol = "£";

@@ -35,7 +35,7 @@ public class AppMain {
                     // read all text
                     List<String[]> ocrResultsArrayList = getAllOCRResults(FileHelper.getFileNameWithoutExtension(listOfFiles[i]));
                     List<Receipt> receiptList = new ArrayList<>();
-                    identifySuperMarketName(receiptList, ocrResultsArrayList);
+                    receiptList = identifySuperMarketName(receiptList, ocrResultsArrayList);
 
 
                     // process receipt for restaurant name
@@ -52,29 +52,34 @@ public class AppMain {
         }
     }
 
+    public static String finalizeSuperMartketName() {
+
+
+        return "";
+    }
+
     public static List<Receipt> identifySuperMarketName(List<Receipt> receiptList, List<String[]> stringsArrayList) {
         Properties properties = Configs.getConfigs(Configs.SUPER_MARKET_TEMPLATE_NAME);
 
         for (String[] ocrResults : stringsArrayList) {
-
             for(String key : properties.stringPropertyNames()) {
                 String templateName = properties.getProperty(key);
-                int[] scoreArray = new int[ocrResults.length];
+                int[] scoreArrayForPreProcess = new int[ocrResults.length];
+                Arrays.fill(scoreArrayForPreProcess, 50);
 
                 for(int j=0; j < ocrResults.length; j++) {
-                    if ((templateName.length() * 2) <= ocrResults[j].length()) {
-                        scoreArray[j] = StringHelper.distance(templateName, ocrResults[j].toLowerCase());
+                    if ((templateName.length() * 2) >= ocrResults[j].length()) {
+                        scoreArrayForPreProcess[j] = StringHelper.distance(templateName, ocrResults[j].toLowerCase());
                     }
                 }
                 Receipt receipt = new Receipt();
                 receipt.setRestaurantName(templateName);
-                Arrays.sort(scoreArray);
-                receipt.setNameRecognitionRank(scoreArray[0]);
+                Arrays.sort(scoreArrayForPreProcess);
+                receipt.setNameRecognitionRank(scoreArrayForPreProcess[0]);
 
                 receiptList.add(receipt);
             }
         }
-
         return receiptList;
     }
 
