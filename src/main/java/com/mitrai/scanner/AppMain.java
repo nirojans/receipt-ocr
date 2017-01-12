@@ -4,6 +4,9 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 import static org.junit.Assert.assertTrue;
@@ -27,27 +30,12 @@ public class AppMain {
                 String extensionName = FileHelper.getFileExtension(listOfFiles[i]);
                 System.out.println("extension name is " + extensionName);
                 if (extensionName.equalsIgnoreCase("jpeg") || extensionName.equalsIgnoreCase("jpg") || extensionName.equalsIgnoreCase("png")) {
-//                    TesseractEngine.TerminalImplementation(TesseractEngine.getCommandForTesseract(fileName, method1ScriptName));
-//                    TesseractEngine.TerminalImplementation(TesseractEngine.getCommandForTesseract(fileName, method2ScriptName));
-//                    TesseractEngine.TerminalImplementation(TesseractEngine.getCommandForTesseract(fileName, method3ScriptName));
+//                    performPreProcessingAndOCR(fileName);
 
                     // read all text
-                    System.out.println("remove _ extension" + FileHelper.getFileNameWithoutExtension(listOfFiles[i]));
-                    String[] result1 = FileHelper.readFile(FileHelper.resultsFolderPath + FilenameUtils.removeExtension(fileName) + "_1");
-                    String[] result2 = FileHelper.readFile(FileHelper.resultsFolderPath + FilenameUtils.removeExtension(fileName) + "_2");
-                    String[] result3 = FileHelper.readFile(FileHelper.resultsFolderPath + FilenameUtils.removeExtension(fileName) + "_3");
-
-                    // get all super market template names
-                    Properties properties = Configs.getConfigs(Configs.SUPER_MARKET_TEMPLATE_NAME);
-
-                    String templateName = properties.getProperty("tesco_template_name");
-                    for (String r : result1) {
-                        if ((templateName.length() * 2) <= r.length()) {
-                            StringHelper.distance(templateName, r.toLowerCase());
-                        }
-
-                        // record the best results
-                    }
+                    List<String[]> ocrResultsArrayList = getAllOCRResults(FileHelper.getFileNameWithoutExtension(listOfFiles[i]));
+                    List<Receipt> receiptList = new ArrayList<>();
+                    identifySuperMarketName(receiptList, ocrResultsArrayList);
 
 
                     // process receipt for restaurant name
@@ -62,5 +50,52 @@ public class AppMain {
                 }
             }
         }
+    }
+
+    public static List<Receipt> identifySuperMarketName(List<Receipt> receiptList, List<String[]> stringsArrayList) {
+        Properties properties = Configs.getConfigs(Configs.SUPER_MARKET_TEMPLATE_NAME);
+
+        for (String[] ocrResults : stringsArrayList) {
+
+            for(String key : properties.stringPropertyNames()) {
+                String templateName = properties.getProperty(key);
+                int[] scoreArray = new int[ocrResults.length];
+
+                for(int j=0; j < ocrResults.length; j++) {
+                    if ((templateName.length() * 2) <= ocrResults[j].length()) {
+                        scoreArray[j] = StringHelper.distance(templateName, ocrResults[j].toLowerCase());
+                    }
+                }
+                Receipt receipt = new Receipt();
+                receipt.setRestaurantName(templateName);
+                Arrays.sort(scoreArray);
+                receipt.setNameRecognitionRank(scoreArray[0]);
+
+                receiptList.add(receipt);
+            }
+        }
+
+        return receiptList;
+    }
+
+    public static List<String[]> getAllOCRResults(String fileName) {
+
+        List<String[]> stringArrayList = new ArrayList<>();
+
+        try {
+            for (int i=1;i<4;i++) {
+                stringArrayList.add(FileHelper.readFile(FileHelper.resultsFolderPath + FilenameUtils.removeExtension(fileName) + "_" + i));
+            }
+        } catch (Exception e) {
+            System.out.println("File not found for the OCR's results");
+        }
+
+        return stringArrayList;
+    }
+
+    public static void performPreProcessingAndOCR(String fileName) throws IOException, InterruptedException {
+        TesseractEngine.TerminalImplementation(TesseractEngine.getCommandForTesseract(fileName, method1ScriptName));
+        TesseractEngine.TerminalImplementation(TesseractEngine.getCommandForTesseract(fileName, method2ScriptName));
+        TesseractEngine.TerminalImplementation(TesseractEngine.getCommandForTesseract(fileName, method3ScriptName));
     }
 }

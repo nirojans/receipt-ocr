@@ -8,6 +8,7 @@ import java.util.ArrayList;
 public class Receipt {
 
     String restaurantName;
+    int nameRecognitionRank;
     ArrayList<LineItem> lineItemses;
     String date;
     String otherValues;
@@ -42,5 +43,13 @@ public class Receipt {
 
     public void setOtherValues(String otherValues) {
         this.otherValues = otherValues;
+    }
+
+    public int getNameRecognitionRank() {
+        return nameRecognitionRank;
+    }
+
+    public void setNameRecognitionRank(int nameRecognitionRank) {
+        this.nameRecognitionRank = nameRecognitionRank;
     }
 }
