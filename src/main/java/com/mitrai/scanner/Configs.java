@@ -12,25 +12,12 @@ public class Configs {
     public static final String SUPER_MARKET_TEMPLATE_NAME = "template.properties";
 
     public static Properties getConfigs(String fileName) {
-        String resourceName = fileName;
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
         Properties props = new Properties();
-        try (InputStream resourceStream = loader.getResourceAsStream(resourceName)) {
+        try (InputStream resourceStream = loader.getResourceAsStream(fileName)) {
             props.load(resourceStream);
         } catch (Exception e) {
-            System.out.println("Exception has occurred during the config reading phase");
-        }
-        return props;
-    }
-
-    public static Properties getFolderNames() {
-        String resourceName = CONFIG_FILE_NAME;
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        Properties props = new Properties();
-        try (InputStream resourceStream = loader.getResourceAsStream(resourceName)) {
-            props.load(resourceStream);
-        } catch (Exception e) {
-            System.out.println("Exception has occurred during the config reading phase");
+            System.out.println("Exception has occurred during reading the configuration files");
         }
         return props;
     }

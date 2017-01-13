@@ -30,7 +30,7 @@ public class FileHelper {
     public static String resultsFolderPath = "";
 
     static {
-        Properties properties = Configs.getFolderNames();
+        Properties properties = Configs.getConfigs(Configs.CONFIG_FILE_NAME);
         baseFolderPath = properties.getProperty("base_folder");
         baseFolderPath = properties.getProperty("base_folder_path");
         rawFolderPath = properties.getProperty("raw_image_folder_path");

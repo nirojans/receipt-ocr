@@ -1,10 +1,6 @@
 package com.mitrai.scanner;
 
-import org.apache.commons.io.FilenameUtils;
-
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
@@ -22,21 +18,22 @@ public class AppMain {
 
         for (int i = 0; i < listOfFiles.length; i++) {
             if (listOfFiles[i].isFile()) {
-                String fileName = listOfFiles[i].getName();
+                String fileNameWithExtension = listOfFiles[i].getName();
+                String fileNameWithoutExtension = FileHelper.getFileNameWithoutExtension(listOfFiles[i]);
                 // check if it is a valid input
                 String extensionName = FileHelper.getFileExtension(listOfFiles[i]);
                 if (extensionName.equalsIgnoreCase("jpeg") || extensionName.equalsIgnoreCase("jpg") || extensionName.equalsIgnoreCase("png")) {
-//                    TesseractEngine.performPreProcessingAndOCR(fileName);
+                    TesseractEngine.performPreProcessingAndOCR(fileNameWithExtension);
 
                     // read all text
-                    List<Receipt> receiptList = FileHelper.readAllResultsForAImage(FileHelper.getFileNameWithoutExtension(listOfFiles[i]));
+                    List<Receipt> receiptList = FileHelper.readAllResultsForAImage(fileNameWithoutExtension);
                     receiptList = identifySuperMarketName(receiptList);
                     TemplateEngine.identifyLineItems(receiptList);
 
                     Receipt highReceipt = receiptList.get(receiptList.size()-1);
                     FileHelper.writeResultsToFile(highReceipt, "results.txt");
-                    highReceipt.setId("second");
-                    DataServiceImpl.createDB(highReceipt);
+                    highReceipt.setId(fileNameWithoutExtension);
+                    DataServiceImpl.insertIntoDB(highReceipt);
                 }
             }
         }
