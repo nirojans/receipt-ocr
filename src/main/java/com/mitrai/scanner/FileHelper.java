@@ -102,9 +102,11 @@ public class FileHelper {
         List<Receipt> receiptList = new ArrayList<>();
         try {
             for (int i=1;i<4;i++) {
+                String nameOfTheFile = FilenameUtils.removeExtension(fileName) + "_" + i;
                 Receipt receipt = new Receipt();
                 receipt.setRawData(FileHelper.readFile(FileHelper.resultsFolderPath + FilenameUtils.removeExtension(fileName) + "_" + i));
                 receipt.setPreprocessMethod(i);
+                receipt.setId(nameOfTheFile);
                 receiptList.add(receipt);
             }
         } catch (Exception e) {

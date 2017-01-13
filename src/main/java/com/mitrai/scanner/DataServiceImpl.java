@@ -18,7 +18,7 @@ import java.util.List;
  */
 public class DataServiceImpl {
 
-    public static void insertIntoDB(Receipt receipt) throws UnknownHostException {
+    public static void insertIntoDB(MasterReceipt receipt) throws UnknownHostException {
 
         MongoClient mongo = new MongoClient("localhost", 27017);
 

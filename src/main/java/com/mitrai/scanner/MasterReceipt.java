@@ -1,5 +1,6 @@
 package com.mitrai.scanner;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -7,16 +8,21 @@ import java.util.List;
  * This class will be considered as the final receipt of the
  * data extraction process
  */
-public class MasterReceipt {
+public class MasterReceipt implements Serializable {
 
     private String id;
-    private String superMartketName;
+    private String superMarketName;
     private List<LineItem> lineItemList;
     private List<Receipt> receiptList;
     private String date;
     private String time;
     private String additionalInfo;
     private String unclassifiedData;
+
+    public MasterReceipt(String id) {
+        this.id = id;
+    }
+
 
     public String getId() {
         return id;
@@ -26,12 +32,12 @@ public class MasterReceipt {
         this.id = id;
     }
 
-    public String getSuperMartketName() {
-        return superMartketName;
+    public String getSuperMarketName() {
+        return superMarketName;
     }
 
-    public void setSuperMartketName(String superMartketName) {
-        this.superMartketName = superMartketName;
+    public void setSuperMarketName(String superMarketName) {
+        this.superMarketName = superMarketName;
     }
 
     public List<LineItem> getLineItemList() {
