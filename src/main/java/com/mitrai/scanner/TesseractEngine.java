@@ -15,10 +15,13 @@ public class TesseractEngine {
     public static String method2ScriptName = "thresh_sharp.sh";
     public static String method3ScriptName = "fill_sharp_clean.sh";
 
+    public static String moveFileScriptName = "move_raw_image_to_archive.sh";
+
     public static void performPreProcessingAndOCR(String fileName) throws IOException, InterruptedException {
         TesseractEngine.TerminalImplementation(TesseractEngine.getCommandForTesseract(fileName, method1ScriptName));
         TesseractEngine.TerminalImplementation(TesseractEngine.getCommandForTesseract(fileName, method2ScriptName));
         TesseractEngine.TerminalImplementation(TesseractEngine.getCommandForTesseract(fileName, method3ScriptName));
+        TesseractEngine.TerminalImplementation(TesseractEngine.getCommandToMoveImageToArchive(fileName, moveFileScriptName));
     }
 
     /*
@@ -38,7 +41,7 @@ public class TesseractEngine {
             while ((line = reader.readLine()) != null) {
                 output.append(line + "\n");
             }
-            System.out.println(line);
+            System.out.println(output);
         } catch (InterruptedException e) {
             throw e;
         } catch (IOException e) {
@@ -50,6 +53,12 @@ public class TesseractEngine {
     public static String getCommandForTesseract(String fileName, String scriptName) {
         String command = "sh scripts/" + scriptName + " " + FileHelper.rawFolderPath + fileName + " " +
                 FilenameUtils.removeExtension(fileName) + " " + FileHelper.preprocessedFolderPath + " " + FileHelper.resultsFolderPath + " " + FileHelper.archivedFolderPath;
+        System.out.println(command);
+        return command;
+    }
+
+    public static String getCommandToMoveImageToArchive(String fileName, String scriptName) {
+        String command = "sh scripts/" + scriptName + " " + FileHelper.rawFolderPath + fileName + " " + FileHelper.archivedFolderPath;
         System.out.println(command);
         return command;
     }

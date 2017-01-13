@@ -1,3 +1,3 @@
 #!/bin/bash
-awk 'NF' final.txt > out.txt
+mv $1 $2
 
