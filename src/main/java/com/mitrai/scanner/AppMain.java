@@ -18,13 +18,15 @@ public class AppMain {
         FileHelper.initBaseFolder();
         File[] listOfFiles = FileHelper.getAllFileNames();
 
+
+
         for (int i = 0; i < listOfFiles.length; i++) {
             if (listOfFiles[i].isFile()) {
                 String fileName = listOfFiles[i].getName();
                 // check if it is a valid input
                 String extensionName = FileHelper.getFileExtension(listOfFiles[i]);
                 if (extensionName.equalsIgnoreCase("jpeg") || extensionName.equalsIgnoreCase("jpg") || extensionName.equalsIgnoreCase("png")) {
-                    TesseractEngine.performPreProcessingAndOCR(fileName);
+//                    TesseractEngine.performPreProcessingAndOCR(fileName);
 
                     // read all text
                     List<Receipt> receiptList = FileHelper.readAllResultsForAImage(FileHelper.getFileNameWithoutExtension(listOfFiles[i]));
@@ -33,7 +35,8 @@ public class AppMain {
 
                     Receipt highReceipt = receiptList.get(receiptList.size()-1);
                     FileHelper.writeResultsToFile(highReceipt, "results.txt");
-
+                    highReceipt.setId("second");
+                    DataServiceImpl.createDB(highReceipt);
                 }
             }
         }

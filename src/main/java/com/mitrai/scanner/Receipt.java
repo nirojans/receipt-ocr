@@ -1,16 +1,21 @@
 package com.mitrai.scanner;
 
+import com.mongodb.BasicDBObject;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by niro273 on 1/11/17.
  */
-public class Receipt {
+public class Receipt implements Serializable {
 
+    // Image name is considered to be the receipt name
+    private String id;
     private String superMarketName;
     private int nameRecognitionRank;
-    private List<LineItem> lineItems = new ArrayList<>();
+    private ArrayList<LineItem> lineItems = new ArrayList<>();
     private String date;
     private String otherValues;
     private String[] rawData;
@@ -59,14 +64,6 @@ public class Receipt {
         this.rawData = rawData;
     }
 
-    public List<LineItem> getLineItems() {
-        return lineItems;
-    }
-
-    public void setLineItems(List<LineItem> lineItems) {
-        this.lineItems = lineItems;
-    }
-
     public int getLineItemEndLine() {
         return lineItemEndLine;
     }
@@ -90,4 +87,22 @@ public class Receipt {
     public void setPreprocessMethod(int preprocessMethod) {
         this.preprocessMethod = preprocessMethod;
     }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public ArrayList<LineItem> getLineItems() {
+        return lineItems;
+    }
+
+    public void setLineItems(ArrayList<LineItem> lineItems) {
+        this.lineItems = lineItems;
+    }
+
+
 }

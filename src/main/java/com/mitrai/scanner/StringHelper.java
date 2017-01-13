@@ -14,7 +14,7 @@ public class StringHelper {
 
         boolean firstLineItem = true;
 
-        List<LineItem> lineItemList = new ArrayList<>();
+        ArrayList<LineItem> lineItemList = new ArrayList<>();
         String[] inputStrings = receipt.getRawData();
         Pattern p = Pattern.compile(regex);
         for (int i=0; i < inputStrings.length; i++) {

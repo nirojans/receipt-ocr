@@ -21,6 +21,9 @@ public class TesseractEngine {
         TesseractEngine.TerminalImplementation(TesseractEngine.getCommandForTesseract(fileName, method3ScriptName));
     }
 
+    /*
+    This method invokes a script via the command line
+     */
     public static String TerminalImplementation(String command) throws InterruptedException, IOException {
 
         StringBuffer output = new StringBuffer();
@@ -35,6 +38,7 @@ public class TesseractEngine {
             while ((line = reader.readLine()) != null) {
                 output.append(line + "\n");
             }
+            System.out.println(line);
         } catch (InterruptedException e) {
             throw e;
         } catch (IOException e) {
@@ -49,6 +53,4 @@ public class TesseractEngine {
         System.out.println(command);
         return command;
     }
-
-
 }

@@ -1,9 +1,13 @@
 package com.mitrai.scanner;
 
+import com.mongodb.BasicDBObject;
+
+import java.io.Serializable;
+
 /**
  * Created by niro273 on 1/11/17.
  */
-public class LineItem {
+public class LineItem implements Serializable {
 
     private int accuracyLevel;
     private String description;
@@ -58,6 +62,9 @@ public class LineItem {
     }
 
     public void setLineNumber(int lineNumber) {
+
         this.lineNumber = lineNumber;
     }
+
+
 }
