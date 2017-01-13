@@ -17,7 +17,6 @@ import java.util.Properties;
  */
 public class FileHelper {
 
-    public static String baseFolder = "";
     public static String baseFolderPath = "";
     public static String rawFolderPath = "";
     public static String archivedFolderPath = "";
@@ -26,8 +25,11 @@ public class FileHelper {
 
     static {
         Properties properties = Configs.getConfigs(Configs.CONFIG_FILE_NAME);
-        baseFolderPath = properties.getProperty("base_folder");
-        baseFolderPath = properties.getProperty("base_folder_path");
+        if (properties.getProperty("production").equals("true")) {
+            baseFolderPath = properties.getProperty("base_folder_path_prod");
+        } else {
+            baseFolderPath = properties.getProperty("base_folder_path_dev");
+        }
         rawFolderPath = baseFolderPath + properties.getProperty("raw_image_folder_path");
         archivedFolderPath = baseFolderPath + properties.getProperty("archived_image_folder_path");
         preprocessedFolderPath = baseFolderPath + properties.getProperty("preprocessed_image_folder_path");
