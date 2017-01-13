@@ -17,11 +17,6 @@ import java.util.Properties;
  */
 public class FileHelper {
 
-    private static String raw_image_folder_name = "raw_images";
-    private static String archived_image_folder_name = "archived_images";
-    private static String preprocessed_image_folder_name = "preprocessed_images";
-    private static String results_folder_name = "results";
-
     public static String baseFolder = "";
     public static String baseFolderPath = "";
     public static String rawFolderPath = "";
@@ -33,10 +28,10 @@ public class FileHelper {
         Properties properties = Configs.getConfigs(Configs.CONFIG_FILE_NAME);
         baseFolderPath = properties.getProperty("base_folder");
         baseFolderPath = properties.getProperty("base_folder_path");
-        rawFolderPath = properties.getProperty("raw_image_folder_path");
-        archivedFolderPath = properties.getProperty("archived_image_folder_path");
-        preprocessedFolderPath = properties.getProperty("preprocessed_image_folder_path");
-        resultsFolderPath = properties.getProperty("results_folder_path");
+        rawFolderPath = baseFolderPath + properties.getProperty("raw_image_folder_path");
+        archivedFolderPath = baseFolderPath + properties.getProperty("archived_image_folder_path");
+        preprocessedFolderPath = baseFolderPath + properties.getProperty("preprocessed_image_folder_path");
+        resultsFolderPath = baseFolderPath + properties.getProperty("results_folder_path");
     }
 
     public static String[] readFile(String fileLocation) throws IOException{
@@ -68,23 +63,37 @@ public class FileHelper {
     }
 
     public static File[] getAllFileNames() {
-        File folder = new File(baseFolderPath + raw_image_folder_name);
+        File folder = new File(rawFolderPath);
         return folder.listFiles();
     }
 
     public static void initBaseFolder() {
-        File file = new File(baseFolderPath);
-        File raw_image_directory = new File(baseFolderPath + raw_image_folder_name);
-        File archived_image_directory = new File(baseFolderPath + archived_image_folder_name);
-        File preprocessed_image_directory = new File(baseFolderPath + preprocessed_image_folder_name);
-        File results_directory = new File(baseFolderPath + results_folder_name);
+        File baseFolder = new File(baseFolderPath);
+        File raw_image_directory = new File(rawFolderPath);
+        File archived_image_directory = new File(archivedFolderPath);
+        File preprocessed_image_directory = new File(preprocessedFolderPath);
+        File results_directory = new File(resultsFolderPath);
 
-        if (!file.exists()) {
-            file.mkdirs();
+        if (!baseFolder.exists()) {
+            System.out.printf("Base folder not found. Initializing base folder");
+            baseFolder.mkdirs();
             raw_image_directory.mkdirs();
             archived_image_directory.mkdirs();
             preprocessed_image_directory.mkdirs();
             results_directory.mkdirs();
+        } else {
+            if (!raw_image_directory.exists()) {
+                raw_image_directory.mkdirs();
+            }
+            if (!archived_image_directory.exists()) {
+                archived_image_directory.mkdirs();
+            }
+            if (!preprocessed_image_directory.exists()) {
+                preprocessed_image_directory.mkdirs();
+            }
+            if (!results_directory.exists()) {
+                results_directory.mkdirs();
+            }
         }
     }
 

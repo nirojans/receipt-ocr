@@ -5,6 +5,8 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
+import java.io.IOException;
+
 /**
  * Created by nirojans on 1/13/17.
  */
@@ -12,10 +14,17 @@ import org.quartz.JobExecutionException;
 @DisallowConcurrentExecution
 public class CronJob implements Job {
 
-    private CronService cronService = new CronService();
+    private OCRCronService OCRCronService = new OCRCronService();
 
     public void execute(JobExecutionContext context) throws JobExecutionException {
-        cronService.startDoingBatchProcessing();
+        try {
+            OCRCronService.startDoingBatchProcessing();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            System.out.println("Exception occurred in the batch processing process");
+            e.printStackTrace();
+        }
     }
 
 }
