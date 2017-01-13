@@ -1,5 +1,8 @@
 package com.mitrai.scanner;
 
+import org.quartz.*;
+import org.quartz.impl.StdSchedulerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -7,7 +10,11 @@ import java.util.*;
 public class AppMain {
 
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws IOException, InterruptedException, SchedulerException {
+        cronJob();
+    }
+
+    public static void ocrTask() throws IOException, InterruptedException {
 //        FileUtils.deleteDirectory(new File(FileHelper.baseFolder));
 
         // Initiate all the folders for batch processing
@@ -37,15 +44,18 @@ public class AppMain {
                 }
             }
         }
+
     }
 
+    public static void cronJob() throws SchedulerException {
 
+        JobDetail job2 = JobBuilder.newJob(CronJob.class).withIdentity("batchJob", "group2").build();
+        Trigger trigger2 = TriggerBuilder.newTrigger().withIdentity("cronTrigger", "group2")
+                .withSchedule(CronScheduleBuilder.cronSchedule("0/2 * * * * ?")).build();
+        org.quartz.Scheduler scheduler2 = new StdSchedulerFactory().getScheduler();
+        scheduler2.start();
+        scheduler2.scheduleJob(job2, trigger2);
 
-
-    public static String finalizeSuperMartketName() {
-
-
-        return "";
     }
 
     public static List<Receipt> identifySuperMarketName(List<Receipt> receiptList) {
