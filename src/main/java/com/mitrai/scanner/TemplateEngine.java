@@ -1,55 +1,64 @@
 package com.mitrai.scanner;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Created by niro273 on 1/4/17.
  */
 public class TemplateEngine {
 
+    public static MasterReceipt identifyTemplateProperties(MasterReceipt masterReceipt) {
 
-    public static List<Receipt> identifySuperMarketName(List<Receipt> receiptList) {
-        Properties properties = Configs.getConfigs(Configs.SUPER_MARKET_TEMPLATE_NAME);
 
-        for (Receipt receipt : receiptList) {
+        return masterReceipt;
+    }
 
-            String[] ocrResults = receipt.getRawData();
-            for(String key : properties.stringPropertyNames()) {
-                String templateName = properties.getProperty(key);
-                int[] scoreArrayForPreProcess = new int[ocrResults.length];
-                Arrays.fill(scoreArrayForPreProcess, 50);
+    public static List<Receipt> identifyDateOfReceipt(List<Receipt> receiptList) {
 
-                for(int j=0; j < ocrResults.length; j++) {
-                    if ((templateName.length() * 2) >= ocrResults[j].length()) {
-                        scoreArrayForPreProcess[j] = StringHelper.distance(templateName, ocrResults[j].toLowerCase());
-                    }
-                }
-                receipt.setSuperMarketName(templateName);
-                Arrays.sort(scoreArrayForPreProcess);
-                receipt.setNameRecognitionRank(scoreArrayForPreProcess[0]);
-            }
-        }
+
+
         return receiptList;
     }
 
 
-    public static String getRetaurantName() {
-        try {
-            String[] br = FileHelper.readFile("images/sharp_clean_resize_result.txt");
+    public static List<Receipt> identifySuperMarketName(List<Receipt> receiptList) {
+        Properties properties = Configs.getConfigs(Configs.SUPER_MARKET_TEMPLATE_NAME);
 
-            // Run a for loop, until we reach the Restaurant Name or the Max lines
+        // Get receipt for each pre processing method
+        for (Receipt receipt : receiptList) {
+            // Get raw data of each receipt
+            String[] ocrResults = receipt.getRawData();
 
-        } catch (IOException e) {
-            e.printStackTrace();
+            // Iterate through all template names
+            Map<String, Integer> templateScoreMap = new HashMap<>();
+
+            for(String key : properties.stringPropertyNames()) {
+
+                // eg - templateName = TESCO
+                String templateName = properties.getProperty(key);
+                // create an integer array to save the string similarity score and fill with mx 50 value
+                int[] scoreArrayForPreProcess = new int[ocrResults.length];
+                Arrays.fill(scoreArrayForPreProcess, 50);
+
+                // Iterate through the raw data of the preprocessed receipts
+                for(int j=0; j < ocrResults.length; j++) {
+                    // If the raw data is twice as big as the template name then do not consider
+                    if ((templateName.length() * 2) >= ocrResults[j].length()) {
+                        scoreArrayForPreProcess[j] = StringHelper.distance(templateName, ocrResults[j].toLowerCase());
+                    }
+                }
+
+
+                // sort the array and get the first element to get the best match score
+                Arrays.sort(scoreArrayForPreProcess);
+                templateScoreMap.put(templateName, scoreArrayForPreProcess[0]);
+
+            }
+            receipt.setSuperMarketName("Template Name");
         }
-        return "Not Found";
+        return receiptList;
     }
-
 
     public static void identifyLineItems(List<Receipt> receiptList) {
         String currencySymbol = "£|€";
