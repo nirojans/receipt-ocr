@@ -3,6 +3,7 @@ package com.mitrai.scanner;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
@@ -21,7 +22,11 @@ public class TesseractEngine {
         TesseractEngine.TerminalImplementation(TesseractEngine.getCommandForTesseract(fileName, method1ScriptName));
         TesseractEngine.TerminalImplementation(TesseractEngine.getCommandForTesseract(fileName, method2ScriptName));
         TesseractEngine.TerminalImplementation(TesseractEngine.getCommandForTesseract(fileName, method3ScriptName));
-        TesseractEngine.TerminalImplementation(TesseractEngine.getCommandToMoveImageToArchive(fileName, moveFileScriptName));
+
+        // If dev environment keep the files in the raw images with out moving
+        if (FileHelper.isProd) {
+            TesseractEngine.TerminalImplementation(TesseractEngine.getCommandToMoveImageToArchive(fileName, moveFileScriptName));
+        }
     }
 
     /*

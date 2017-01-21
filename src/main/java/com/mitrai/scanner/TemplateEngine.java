@@ -8,6 +8,8 @@ import java.util.*;
  */
 public class TemplateEngine {
 
+    public static boolean ASC = true;
+
     public static MasterReceipt identifyTemplateProperties(MasterReceipt masterReceipt) {
 
 
@@ -21,6 +23,12 @@ public class TemplateEngine {
         return receiptList;
     }
 
+    public static void identifyDate() {
+
+
+
+
+    }
 
     public static List<Receipt> identifySuperMarketName(List<Receipt> receiptList) {
         Properties properties = Configs.getConfigs(Configs.SUPER_MARKET_TEMPLATE_NAME);
@@ -49,13 +57,18 @@ public class TemplateEngine {
                     }
                 }
 
-
                 // sort the array and get the first element to get the best match score
                 Arrays.sort(scoreArrayForPreProcess);
                 templateScoreMap.put(templateName, scoreArrayForPreProcess[0]);
 
             }
-            receipt.setSuperMarketName("Template Name");
+            Map<String, Integer> sortedMapAsc = Utils.sortByComparator(templateScoreMap, ASC);
+            Map.Entry<String, Integer> entry = sortedMapAsc.entrySet().iterator().next();
+            if (entry.getValue() < 2) {
+                receipt.setSuperMarketName(entry.getKey());
+            }else {
+                receipt.setSuperMarketName("UnIdentified");
+            }
         }
         return receiptList;
     }
@@ -64,8 +77,9 @@ public class TemplateEngine {
         String currencySymbol = "£|€";
 
         String regex = "(?<description>.+)\\s{2,}(?<currency>"+currencySymbol+"|\\w)(?<amount>\\d+\\.\\d{2})";
+        String strongRegex = "(?<description>.+)\\s{2,}(?<currency>"+currencySymbol+")(?<amount>\\d+\\.\\d{2})";
         for (Receipt r : receiptList) {
-            StringHelper.getLineItemsForReceipt(r, regex);
+            StringHelper.getLineItemsForReceipt(r, strongRegex);
         }
 
         // This method compares all the line items identified and sorts them in to lowest to highest

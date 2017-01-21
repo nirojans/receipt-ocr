@@ -29,7 +29,10 @@ public class OCRCronService {
                 // check if it is a valid input
                 String extensionName = FileHelper.getFileExtension(listOfFiles[i]);
                 if (extensionName.equalsIgnoreCase("jpeg") || extensionName.equalsIgnoreCase("jpg") || extensionName.equalsIgnoreCase("png")) {
-                    TesseractEngine.performPreProcessingAndOCR(fileNameWithExtension);
+
+                    if (FileHelper.isProd) {
+                        TesseractEngine.performPreProcessingAndOCR(fileNameWithExtension);
+                    }
 
                     // read all text
                     List<Receipt> receiptList = FileHelper.readAllResultsForAImage(fileNameWithoutExtension);
@@ -43,7 +46,7 @@ public class OCRCronService {
                     FileHelper.writeResultsToFile(highReceipt, fileNameWithoutExtension + "_results.txt");
 
                     masterReceipt.setLineItemList(highReceipt.getLineItems());
-                    DataServiceImpl.insertIntoDB(masterReceipt);
+//                    DataServiceImpl.insertIntoDB(masterReceipt);
                 }
             }
         }

@@ -22,10 +22,12 @@ public class FileHelper {
     public static String archivedFolderPath = "";
     public static String preprocessedFolderPath = "";
     public static String resultsFolderPath = "";
+    public static boolean isProd = false;
 
     static {
         Properties properties = Configs.getConfigs(Configs.CONFIG_FILE_NAME);
         if (properties.getProperty("production").equals("true")) {
+            isProd = true;
             baseFolderPath = properties.getProperty("base_folder_path_prod");
         } else {
             baseFolderPath = properties.getProperty("base_folder_path_dev");

@@ -10,7 +10,7 @@ echo $threshold
 sh scripts/magicwand 10,10 -t $threshold -f image -r outside $1 $3$2"_3_temp_magic.tiff"
 convert  -normalize -level 10%,90% -sharpen 0x1 $3$2"_3_temp_magic.tiff" $3$2"_3_temp_sharp.tiff"
 sh scripts/textcleaner  -g -e normalize -f 15 -o 10 $3$2"_3_temp_sharp.tiff" $3$2"_3_temp_clean.tiff"
-convert $3$2"_3_temp_clean.tiff" -resize 300% $3$2"_3.tiff"
+convert $3$2"_3_temp_clean.tiff" -density 300 $3$2"_3.tiff"
 tesseract $3$2"_3.tiff" $4$2"_3_temp" -c preserve_interword_spaces=1 -psm 4
 rm $3$2"_3_temp_magic.tiff"
 rm $3$2"_3_temp_sharp.tiff"

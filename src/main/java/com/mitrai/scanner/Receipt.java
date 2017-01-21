@@ -15,10 +15,15 @@ public class Receipt implements Serializable {
     private String id;
     private String superMarketName;
     private int nameRecognitionRank;
+
     private ArrayList<LineItem> lineItems = new ArrayList<>();
+    private List<String> possibleLineItems;
+
     private String date;
+    private String time;
     private String otherValues;
     private String[] rawData;
+    private List unclassifiedLineItemNumbers;
 
     private int lineItemEndLine;
     private int lineItemStartLine;
@@ -104,5 +109,27 @@ public class Receipt implements Serializable {
         this.lineItems = lineItems;
     }
 
+    public String getTime() {
+        return time;
+    }
 
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public List getUnclassifiedLineItemNumbers() {
+        return unclassifiedLineItemNumbers;
+    }
+
+    public void setUnclassifiedLineItemNumbers(List unclassifiedLineItemNumbers) {
+        this.unclassifiedLineItemNumbers = unclassifiedLineItemNumbers;
+    }
+
+    public List<String> getPossibleLineItems() {
+        return possibleLineItems;
+    }
+
+    public void setPossibleLineItems(List<String> possibleLineItems) {
+        this.possibleLineItems = possibleLineItems;
+    }
 }

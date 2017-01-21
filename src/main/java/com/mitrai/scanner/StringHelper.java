@@ -17,6 +17,11 @@ public class StringHelper {
         ArrayList<LineItem> lineItemList = new ArrayList<>();
         String[] inputStrings = receipt.getRawData();
         Pattern p = Pattern.compile(regex);
+
+        List<Integer> integerList = new ArrayList<>();
+        List<String> possibleLineItems = new ArrayList<>();
+
+
         for (int i=0; i < inputStrings.length; i++) {
             String inputString = inputStrings[i];
             Matcher m = p.matcher(inputString);
@@ -28,7 +33,8 @@ public class StringHelper {
                 }
                 receipt.setLineItemEndLine(i);
 
-                String description  = m.group("description").trim();
+                // replaces extra spaces with one single space
+                String description  = m.group("description").trim().replaceAll(" +", " ");;
                 String currency     = m.group("currency");
                 String amountString = m.group("amount");
 
@@ -39,10 +45,32 @@ public class StringHelper {
                 lineItem.setLineNumber(i);
 
                 lineItemList.add(lineItem);
+            } else if (!firstLineItem) {
+                integerList.add(i);
+                possibleLineItems.add(inputString);
             }
         }
         receipt.setLineItems(lineItemList);
+        receipt.setUnclassifiedLineItemNumbers(integerList);
+        receipt.setPossibleLineItems(possibleLineItems);
         return receipt;
+    }
+
+    public static void testForDate() {
+
+        String[] inputStrings = {"12/10/19   12:36", "12/12/13"};
+        String regex = "([0-9]{2})\\/([0-9]{2})\\/([0-9]{2})";
+
+        Pattern p = Pattern.compile(regex);
+        for (String input : inputStrings) {
+            Matcher m = p.matcher(input);
+            if (m.find()) {
+                String day = m.group(0);
+                String month = m.group(1);
+                String year = m.group(1);
+            }
+        }
+
     }
 
 
