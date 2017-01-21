@@ -11,6 +11,13 @@ public class Configs {
     public static final String CONFIG_FILE_NAME = "config.properties";
     public static final String SUPER_MARKET_TEMPLATE_NAME = "template.properties";
 
+    public static int maxFileSize;
+
+    static{
+        Properties properties = Configs.getConfigs(Configs.CONFIG_FILE_NAME);
+        maxFileSize = Integer.parseInt(properties.getProperty("max_file_size"));
+    }
+
 
 
     public static Properties getConfigs(String fileName) {

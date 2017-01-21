@@ -1,5 +1,6 @@
 package com.mitrai.scanner;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.BufferedReader;
@@ -11,6 +12,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.Random;
+
+import static com.mitrai.scanner.Configs.maxFileSize;
 
 /**
  * Created by niro273 on 1/4/17.
@@ -22,7 +26,10 @@ public class FileHelper {
     public static String archivedFolderPath = "";
     public static String preprocessedFolderPath = "";
     public static String resultsFolderPath = "";
+    public static String receiptsFolderPath = "";
     public static boolean isProd = false;
+
+    public static int maxRandomFileCount = 10;
 
     static {
         Properties properties = Configs.getConfigs(Configs.CONFIG_FILE_NAME);
@@ -36,6 +43,7 @@ public class FileHelper {
         archivedFolderPath = baseFolderPath + properties.getProperty("archived_image_folder_path");
         preprocessedFolderPath = baseFolderPath + properties.getProperty("preprocessed_image_folder_path");
         resultsFolderPath = baseFolderPath + properties.getProperty("results_folder_path");
+        receiptsFolderPath = properties.getProperty("receipts_folder_path");
     }
 
     public static String[] readFile(String fileLocation) throws IOException{
@@ -132,6 +140,49 @@ public class FileHelper {
             bw.write(content);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public static List<File> selectRandomReceipts() {
+
+        List<File> fileList = new ArrayList<>();
+
+        File folder = new File(receiptsFolderPath);
+        File[] files = folder.listFiles();
+
+        if (files != null) {
+            for (int i=1; i<files.length; i++) {
+
+                int random = new Random().nextInt(files.length);
+                File file = files[random];
+                if(file.exists()){
+
+                    double bytes = file.length();
+                    double kilobytes = (bytes / 1024);
+
+                    if (maxFileSize < kilobytes) {
+                        fileList.add(file);
+                    }
+                    if (fileList.size() == maxRandomFileCount) {
+                        break;
+                    }
+                }
+            }
+        }
+        return fileList;
+    }
+
+    public static void copySelectedReceiptsToRawImageFolder(List<File> fileList) {
+
+        for (File sourceFile : fileList) {
+            String fileName = sourceFile.getName();
+            File dest = new File(rawFolderPath + fileName);
+
+            try {
+                FileUtils.copyFile(sourceFile, dest);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
