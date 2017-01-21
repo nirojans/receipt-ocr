@@ -6,4 +6,3 @@ tesseract $3$2"_2.tiff" $4$2"_2_temp" -c preserve_interword_spaces=1 -psm 4
 rm $3$2"_2_temp_thresh.tiff"
 awk 'NF' $4$2"_2_temp.txt" > $4$2"_2"
 rm $4$2"_2_temp.txt"
-

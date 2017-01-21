@@ -2,6 +2,7 @@ package com.mitrai.scanner;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -30,12 +31,10 @@ public class OCRCronService {
                 String extensionName = FileHelper.getFileExtension(listOfFiles[i]);
                 if (extensionName.equalsIgnoreCase("jpeg") || extensionName.equalsIgnoreCase("jpg") || extensionName.equalsIgnoreCase("png")) {
 
-                    if (FileHelper.isProd) {
-                        TesseractEngine.performPreProcessingAndOCR(fileNameWithExtension);
-                    }
+                    List<Receipt> receiptList = performOCRBasedOnProdOrDev(fileNameWithExtension, fileNameWithoutExtension);
 
                     // read all text
-                    List<Receipt> receiptList = FileHelper.readAllResultsForAImage(fileNameWithoutExtension);
+                    receiptList = FileHelper.readAllResultsForAImage(fileNameWithoutExtension);
                     receiptList = TemplateEngine.identifySuperMarketName(receiptList);
                     TemplateEngine.identifyLineItems(receiptList);
 
@@ -52,5 +51,19 @@ public class OCRCronService {
         }
 
         System.out.println("Ending the batch processing " + new Date());
+    }
+
+    public static List<Receipt> performOCRBasedOnProdOrDev(String fileNameWithExtension, String fileNameWithoutExtension) throws IOException, InterruptedException {
+        List<Receipt> receiptList;
+        if (FileHelper.isProd) {
+            TesseractEngine.performPreProcessingAndOCR(fileNameWithExtension);
+        } else {
+            // If the results files are not found do the pre processing
+            receiptList = FileHelper.readAllResultsForAImage(fileNameWithoutExtension);
+            if (receiptList.size() == 0) {
+                TesseractEngine.performPreProcessingAndOCR(fileNameWithExtension);
+            }
+        }
+        return FileHelper.readAllResultsForAImage(fileNameWithoutExtension);
     }
 }

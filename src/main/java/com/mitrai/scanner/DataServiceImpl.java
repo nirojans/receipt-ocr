@@ -31,25 +31,31 @@ public class DataServiceImpl {
         mongo.close();
     }
 
-    public static List<Receipt> getReceiptDataFromDB() throws UnknownHostException {
+    public static List<ManualReceipt> getReceiptDataFromDB(String searchTerm) throws UnknownHostException {
         MongoClient mongo = new MongoClient("localhost", 27017);
-        DB db = mongo.getDB("mitra");
-        DBCollection col = db.getCollection("receipts");
+        DB db = mongo.getDB("tesco");
+        DBCollection col = db.getCollection("things");
 
-        DBCursor cursor = col.find(new BasicDBObject("id","second"));
-        List<Receipt> receiptList = new ArrayList<>();
+        DBObject search = new BasicDBObject("$text", new BasicDBObject("$search", searchTerm));
+        DBObject project = new BasicDBObject("score", new BasicDBObject("$meta", "textScore"));
+        DBObject sorting = new BasicDBObject("score", new BasicDBObject("$meta", "textScore"));
+
+        DBCursor cursor = col.find(search, project).sort(sorting);
+
+
+        List<ManualReceipt> manualReceiptList = new ArrayList<>();
 
         try {
             while(cursor.hasNext()) {
                 DBObject dbObject = cursor.next();
-                Receipt dbReceipt = (new Gson()).fromJson(dbObject.toString(), Receipt.class);
-                receiptList.add(dbReceipt);
+                ManualReceipt manualReceipt = (new Gson()).fromJson(dbObject.toString(), ManualReceipt.class);
+                manualReceiptList.add(manualReceipt);
             }
         } finally {
             cursor.close();
             mongo.close();
         }
-        return receiptList;
+        return manualReceiptList;
     }
 
 }

@@ -13,6 +13,8 @@ public class ManualReceipt implements Serializable {
     private String QUANTITY;
     private String PERIOD_YEAR;
 
+    private double score;
+
     public String getTILLROLL_DOC_ID() {
         return TILLROLL_DOC_ID;
     }
@@ -51,5 +53,13 @@ public class ManualReceipt implements Serializable {
 
     public void setPERIOD_YEAR(String PERIOD_YEAR) {
         this.PERIOD_YEAR = PERIOD_YEAR;
+    }
+
+    public double getScore() {
+        return score;
+    }
+
+    public void setScore(double score) {
+        this.score = score;
     }
 }

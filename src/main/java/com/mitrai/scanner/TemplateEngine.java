@@ -23,13 +23,6 @@ public class TemplateEngine {
         return receiptList;
     }
 
-    public static void identifyDate() {
-
-
-
-
-    }
-
     public static List<Receipt> identifySuperMarketName(List<Receipt> receiptList) {
         Properties properties = Configs.getConfigs(Configs.SUPER_MARKET_TEMPLATE_NAME);
 
@@ -65,7 +58,9 @@ public class TemplateEngine {
             Map<String, Integer> sortedMapAsc = Utils.sortByComparator(templateScoreMap, ASC);
             Map.Entry<String, Integer> entry = sortedMapAsc.entrySet().iterator().next();
             if (entry.getValue() < 2) {
-                receipt.setSuperMarketName(entry.getKey());
+                // TODO split the super market name by _1
+                String superMarketName = entry.getKey();
+                receipt.setSuperMarketName(superMarketName.replace("_1",""));
             }else {
                 receipt.setSuperMarketName("UnIdentified");
             }

@@ -4,13 +4,13 @@ import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 
 import java.io.IOException;
+import java.util.List;
 
 public class AppMain {
 
     public static void main(String[] args) throws IOException, InterruptedException, SchedulerException {
         System.out.printf("Starting the main application");
         cronJob();
-//        StringHelper.testForDate();
     }
 
     public static void cronJob() throws SchedulerException {
