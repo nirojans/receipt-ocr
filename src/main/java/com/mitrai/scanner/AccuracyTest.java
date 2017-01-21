@@ -5,8 +5,10 @@ package com.mitrai.scanner;
  */
 public class AccuracyTest {
 
-    public static void verifySuperMarketBrand() {
+    public static int verifySuperMarketBrand(String id, String brandName) {
 
+
+        return 100;
     }
 
     public static void verifySuperMarketName() {

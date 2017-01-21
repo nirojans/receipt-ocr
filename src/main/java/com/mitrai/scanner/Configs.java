@@ -11,6 +11,8 @@ public class Configs {
     public static final String CONFIG_FILE_NAME = "config.properties";
     public static final String SUPER_MARKET_TEMPLATE_NAME = "template.properties";
 
+
+
     public static Properties getConfigs(String fileName) {
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
         Properties props = new Properties();
