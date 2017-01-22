@@ -117,6 +117,10 @@ public class FileHelper {
                 String nameOfTheFile = FilenameUtils.removeExtension(fileName) + "_" + i;
                 Receipt receipt = new Receipt();
                 receipt.setRawData(FileHelper.readFile(FileHelper.resultsFolderPath + FilenameUtils.removeExtension(fileName) + "_" + i));
+                // Fix for array index out of bound problem
+                if (receipt.getRawData().length == 0) {
+                    break;
+                }
                 receipt.setPreprocessMethod(i);
                 receipt.setId(nameOfTheFile);
                 receiptList.add(receipt);

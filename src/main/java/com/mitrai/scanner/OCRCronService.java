@@ -35,17 +35,21 @@ public class OCRCronService {
 
                     // read all text
                     receiptList = FileHelper.readAllResultsForAImage(fileNameWithoutExtension);
-                    receiptList = TemplateEngine.identifySuperMarketName(receiptList);
-                    TemplateEngine.identifyLineItems(receiptList);
 
                     MasterReceipt masterReceipt = new MasterReceipt(fileNameWithoutExtension);
+                    masterReceipt = TemplateEngine.identifySuperMarketName(receiptList, masterReceipt);
+                    TemplateEngine.identifyLineItems(receiptList);
+
                     masterReceipt.setReceiptList(receiptList);
+
+                    // get the Highest scoring super market name
+
 
                     Receipt highReceipt = receiptList.get(receiptList.size()-1);
                     FileHelper.writeResultsToFile(highReceipt, fileNameWithoutExtension + "_results.txt");
 
                     masterReceipt.setLineItemList(highReceipt.getLineItems());
-//                    DataServiceImpl.insertIntoDB(masterReceipt);
+                    DataServiceImpl.insertIntoDB(masterReceipt);
                 }
             }
         }

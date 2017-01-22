@@ -23,7 +23,7 @@ public class TemplateEngine {
         return receiptList;
     }
 
-    public static List<Receipt> identifySuperMarketName(List<Receipt> receiptList) {
+    public static MasterReceipt identifySuperMarketName(List<Receipt> receiptList, MasterReceipt masterReceipt) {
         Properties properties = Configs.getConfigs(Configs.SUPER_MARKET_TEMPLATE_NAME);
 
         // Get receipt for each pre processing method
@@ -61,11 +61,21 @@ public class TemplateEngine {
                 // TODO split the super market name by _1
                 String superMarketName = entry.getKey();
                 receipt.setSuperMarketName(superMarketName.replace("_1",""));
+                receipt.setNameAccuracy(entry.getValue());
             }else {
-                receipt.setSuperMarketName("UnIdentified");
+                receipt.setSuperMarketName("Null");
             }
+
+
         }
-        return receiptList;
+        Collections.sort(receiptList, new Comparator<Receipt>(){
+            public int compare(Receipt r1, Receipt r2) {
+                return r1.getNameAccuracy() - r2.getNameAccuracy();
+            }
+        });
+        masterReceipt.setReceiptList(receiptList);
+        masterReceipt.setSuperMarketName(receiptList.get(receiptList.size()-1).getSuperMarketName());
+        return masterReceipt;
     }
 
     public static void identifyLineItems(List<Receipt> receiptList) {

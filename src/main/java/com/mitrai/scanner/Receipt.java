@@ -1,7 +1,5 @@
 package com.mitrai.scanner;
 
-import com.mongodb.BasicDBObject;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +12,7 @@ public class Receipt implements Serializable {
     // Image name is considered to be the receipt name
     private String id;
     private String superMarketName;
-    private int nameRecognitionRank;
+    private int nameAccuracy;
 
     private ArrayList<LineItem> lineItems = new ArrayList<>();
     private List<String> possibleLineItems;
@@ -53,12 +51,12 @@ public class Receipt implements Serializable {
         this.otherValues = otherValues;
     }
 
-    public int getNameRecognitionRank() {
-        return nameRecognitionRank;
+    public int getNameAccuracy() {
+        return nameAccuracy;
     }
 
-    public void setNameRecognitionRank(int nameRecognitionRank) {
-        this.nameRecognitionRank = nameRecognitionRank;
+    public void setNameAccuracy(int nameAccuracy) {
+        this.nameAccuracy = nameAccuracy;
     }
 
     public String[] getRawData() {

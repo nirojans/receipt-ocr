@@ -37,17 +37,35 @@ public class DataServiceImpl {
     }
 
 
-    public static void insertIntoDB(MasterReceipt receipt) throws UnknownHostException {
+    public static void insertIntoDB(MasterReceipt masterReceipt) throws UnknownHostException {
 
         MongoClient mongo = new MongoClient("localhost", 27017);
 
-        DB db = mongo.getDB("mitra");
-        DBCollection col = db.getCollection("receipts");
+        DB db = mongo.getDB(ocrDB);
+        DBCollection col = db.getCollection(ocrReceiptCollection);
 
+        // check if a document exists, If exists remove
+        if (isRecordExists(col, "id", masterReceipt.getId())) {
+            BasicDBObject document = new BasicDBObject();
+            document.put("id", masterReceipt.getId());
+            col.remove(document);
+        }
+
+        // Insert new document to mongo DB
         Gson gson = new Gson();
-        BasicDBObject obj = (BasicDBObject) JSON.parse(gson.toJson(receipt));
+        BasicDBObject obj = (BasicDBObject) JSON.parse(gson.toJson(masterReceipt));
         col.insert(obj);
         mongo.close();
+    }
+
+    public static boolean isRecordExists(DBCollection col, String searchAttribute, String searchValue) {
+        DBCursor cursor = col.find(new BasicDBObject(searchAttribute, searchValue));
+        List<ManualReceipt> manualReceiptList = new ArrayList<>();
+
+        while(cursor.hasNext()) {
+            return true;
+        }
+        return false;
     }
 
     public static List<ManualReceipt> doFullTextSearchFromManualData(String searchTerm, String collectionName) throws UnknownHostException {
@@ -97,6 +115,28 @@ public class DataServiceImpl {
             mongo.close();
         }
         return manualReceiptList;
+    }
+
+    public static List<MasterReceipt> getOCRMasterReceipt(String searchID, String collectionName) throws UnknownHostException {
+
+        MongoClient mongo = new MongoClient("localhost", 27017);
+        DB db = mongo.getDB(ocrDB);
+        DBCollection col = db.getCollection(ocrReceiptCollection);
+
+        DBCursor cursor = col.find(new BasicDBObject("id", searchID));
+        List<MasterReceipt> masterReceiptList = new ArrayList<>();
+
+        try {
+            while(cursor.hasNext()) {
+                DBObject dbObject = cursor.next();
+                MasterReceipt masterReceipt = (new Gson()).fromJson(dbObject.toString(), MasterReceipt.class);
+                masterReceiptList.add(masterReceipt);
+            }
+        } finally {
+            cursor.close();
+            mongo.close();
+        }
+        return masterReceiptList;
     }
 
 }
