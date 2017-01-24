@@ -58,17 +58,17 @@ public class OCRCronService {
 
                     // Do the full text search for the Line Items identified
                     ArrayList<LineItem> predictedLineItemList = new ArrayList<>();
-                    for (LineItem items : highReceipt.getLineItems()) {
-                        String output = doFullTextSearchForLineItems(items.getDescription(), masterReceipt.getSuperMarketName());
+                    for (LineItem item : highReceipt.getLineItems()) {
+
+                        String output = doFullTextSearchForLineItems(item.getDescription(), masterReceipt.getSuperMarketName());
+
                         LineItem predictedItems = new LineItem();
+                        predictedItems.setValue(item.getValue());
                         predictedItems.setDescription(output);
                         predictedLineItemList.add(predictedItems);
                     }
 
                     highReceipt.setPredictedLineItemFromManualData(predictedLineItemList);
-
-                    // implement method to calculate line items accuracy for identified Line items
-
 
                     if (manualTescoReceiptList.size() != 0 && manualSainsReceiptList.size() != 0) {
                         System.out.println("record exists in both excel, cannot compare accuracy");
@@ -81,6 +81,10 @@ public class OCRCronService {
                     }
 
                     int superMarketNameAccuracy = AccuracyTest.verifySuperMarketBrand(masterReceipt.getSuperMarketName(), selectedManualReceiptList);
+
+
+                    // implement method to calculate line items accuracy for identified Line items
+                    AccuracyTest.verifyLineItems(highReceipt, selectedManualReceiptList);
 
                 }
             }
@@ -101,10 +105,10 @@ public class OCRCronService {
             // TODO search in both DB's and get the highest result
         }
 
-        List<ManualReceipt> manualReceiptList = DataServiceImpl.doFullTextSearchFromManualData(lineItem, collectionName);
+        List<ManualReceipt> manualReceiptList = DataServiceImpl.doFullTextSearchFromManualData(lineItem.trim(), collectionName);
         if (manualReceiptList.size() != 0) {
-            if (1.4 < manualReceiptList.get(0).getScore()) {
-                lineItem = manualReceiptList.get(0).getTILLROLL_LINE_DESC();
+            if (1 <= manualReceiptList.get(0).getScore()) {
+                lineItem = manualReceiptList.get(0).getTILLROLL_LINE_DESC().trim();
             }
         }
         return lineItem;

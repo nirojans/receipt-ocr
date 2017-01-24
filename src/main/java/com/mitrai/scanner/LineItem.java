@@ -1,7 +1,5 @@
 package com.mitrai.scanner;
 
-import com.mongodb.BasicDBObject;
-
 import java.io.Serializable;
 
 /**
@@ -9,20 +7,50 @@ import java.io.Serializable;
  */
 public class LineItem implements Serializable {
 
-    private int accuracyLevel;
+    private int descriptionAccuracyLevel;
+    private int descriptionAccuracyPercentage;
+    private int valueAccuracyLevel;
+    private int valueAccuracyPercentage;
+    private int lineNumber;
+    private int manualDatalineNumber;
     private String description;
     private String units;
     private String value;
     private String currencySymbol;
-    private int lineNumber;
 
+    private String manualDataDescription;
+    private String manualDataValue;
 
-    public int getAccuracyLevel() {
-        return accuracyLevel;
+    public LineItem() {
+
     }
 
-    public void setAccuracyLevel(int accuracyLevel) {
-        this.accuracyLevel = accuracyLevel;
+    public void setManualDataForLineItem(int manualDatalineNumber, int descriptionAccuracyLevel,ManualReceipt manualReceipt) {
+        this.manualDatalineNumber = manualDatalineNumber;
+        this.descriptionAccuracyLevel = descriptionAccuracyLevel;
+        this.manualDataDescription = manualReceipt.getTILLROLL_LINE_DESC();
+        this.manualDataValue = manualReceipt.getLINE_PRICE();
+    }
+
+    public LineItem(int descriptionAccuracyLevel, int lineNumber, int manualDatalineNumber, String description, String units, String value, String currencySymbol,
+                    String manualDataDescription, String manualDataValue) {
+        this.descriptionAccuracyLevel = descriptionAccuracyLevel;
+        this.lineNumber = lineNumber;
+        this.manualDatalineNumber = manualDatalineNumber;
+        this.description = description;
+        this.units = units;
+        this.value = value;
+        this.currencySymbol = currencySymbol;
+        this.manualDataDescription = manualDataDescription;
+        this.manualDataValue = manualDataValue;
+    }
+
+    public int getDescriptionAccuracyLevel() {
+        return descriptionAccuracyLevel;
+    }
+
+    public void setDescriptionAccuracyLevel(int descriptionAccuracyLevel) {
+        this.descriptionAccuracyLevel = descriptionAccuracyLevel;
     }
 
     public String getDescription() {
@@ -66,5 +94,51 @@ public class LineItem implements Serializable {
         this.lineNumber = lineNumber;
     }
 
+    public int getManualDatalineNumber() {
+        return manualDatalineNumber;
+    }
 
+    public void setManualDatalineNumber(int manualDatalineNumber) {
+        this.manualDatalineNumber = manualDatalineNumber;
+    }
+
+    public String getManualDataDescription() {
+        return manualDataDescription;
+    }
+
+    public void setManualDataDescription(String manualDataDescription) {
+        this.manualDataDescription = manualDataDescription;
+    }
+
+    public String getManualDataValue() {
+        return manualDataValue;
+    }
+
+    public void setManualDataValue(String manualDataValue) {
+        this.manualDataValue = manualDataValue;
+    }
+
+    public int getValueAccuracyLevel() {
+        return valueAccuracyLevel;
+    }
+
+    public void setValueAccuracyLevel(int valueAccuracyLevel) {
+        this.valueAccuracyLevel = valueAccuracyLevel;
+    }
+
+    public int getDescriptionAccuracyPercentage() {
+        return descriptionAccuracyPercentage;
+    }
+
+    public void setDescriptionAccuracyPercentage(int descriptionAccuracyPercentage) {
+        this.descriptionAccuracyPercentage = descriptionAccuracyPercentage;
+    }
+
+    public int getValueAccuracyPercentage() {
+        return valueAccuracyPercentage;
+    }
+
+    public void setValueAccuracyPercentage(int valueAccuracyPercentage) {
+        this.valueAccuracyPercentage = valueAccuracyPercentage;
+    }
 }

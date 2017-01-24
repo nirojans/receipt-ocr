@@ -12,6 +12,7 @@ public class ManualReceipt implements Serializable {
     private String TILLROLL_LINE_DESC;
     private String QUANTITY;
     private String PERIOD_YEAR;
+    private String LINE_PRICE;
 
     private double score;
 
@@ -61,5 +62,13 @@ public class ManualReceipt implements Serializable {
 
     public void setScore(double score) {
         this.score = score;
+    }
+
+    public String getLINE_PRICE() {
+        return LINE_PRICE;
+    }
+
+    public void setLINE_PRICE(String LINE_PRICE) {
+        this.LINE_PRICE = LINE_PRICE;
     }
 }
