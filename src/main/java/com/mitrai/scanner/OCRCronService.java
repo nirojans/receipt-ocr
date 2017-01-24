@@ -57,9 +57,18 @@ public class OCRCronService {
                     List<ManualReceipt> selectedManualReceiptList = new ArrayList<>();
 
                     // Do the full text search for the Line Items identified
+                    ArrayList<LineItem> predictedLineItemList = new ArrayList<>();
                     for (LineItem items : highReceipt.getLineItems()) {
                         String output = doFullTextSearchForLineItems(items.getDescription(), masterReceipt.getSuperMarketName());
+                        LineItem predictedItems = new LineItem();
+                        predictedItems.setDescription(output);
+                        predictedLineItemList.add(predictedItems);
                     }
+
+                    highReceipt.setPredictedLineItemFromManualData(predictedLineItemList);
+
+                    // implement method to calculate line items accuracy for identified Line items
+
 
                     if (manualTescoReceiptList.size() != 0 && manualSainsReceiptList.size() != 0) {
                         System.out.println("record exists in both excel, cannot compare accuracy");

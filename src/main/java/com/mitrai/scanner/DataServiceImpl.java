@@ -76,7 +76,7 @@ public class DataServiceImpl {
         DBObject project = new BasicDBObject("score", new BasicDBObject("$meta", "textScore"));
         DBObject sorting = new BasicDBObject("score", new BasicDBObject("$meta", "textScore"));
 
-        DBCursor cursor = col.find(search, project).sort(sorting);
+        DBCursor cursor = col.find(search, project).sort(sorting).limit(10);;
 
 
         List<ManualReceipt> manualReceiptList = new ArrayList<>();

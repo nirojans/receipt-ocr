@@ -15,6 +15,7 @@ public class Receipt implements Serializable {
     private int nameAccuracy;
 
     private ArrayList<LineItem> lineItems = new ArrayList<>();
+    private ArrayList<LineItem> predictedLineItemFromManualData = new ArrayList<>();
     private List<String> possibleLineItems;
 
     private String date;
@@ -130,4 +131,14 @@ public class Receipt implements Serializable {
     public void setPossibleLineItems(List<String> possibleLineItems) {
         this.possibleLineItems = possibleLineItems;
     }
+
+    public ArrayList<LineItem> getPredictedLineItemFromManualData() {
+        return predictedLineItemFromManualData;
+    }
+
+    public void setPredictedLineItemFromManualData(ArrayList<LineItem> predictedLineItemFromManualData) {
+        this.predictedLineItemFromManualData = predictedLineItemFromManualData;
+    }
+
+
 }
