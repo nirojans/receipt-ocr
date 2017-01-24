@@ -2,6 +2,7 @@ package com.mitrai.scanner;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -48,12 +49,58 @@ public class OCRCronService {
 
                     masterReceipt.setLineItemList(highReceipt.getLineItems());
                     DataServiceImpl.insertIntoDB(masterReceipt);
+
+                    // get Manual receipt data to compare
+                    List<ManualReceipt> manualTescoReceiptList = DataServiceImpl.getReceiptFromManualData(fileNameWithoutExtension, DataServiceImpl.manualDataTescoCollection);
+                    List<ManualReceipt> manualSainsReceiptList = DataServiceImpl.getReceiptFromManualData(fileNameWithoutExtension, DataServiceImpl.manualDataSaintsCollection);
+
+                    List<ManualReceipt> selectedManualReceiptList = new ArrayList<>();
+
+                    // Do the full text search for the Line Items identified
+                    for (LineItem items : highReceipt.getLineItems()) {
+                        String output = doFullTextSearchForLineItems(items.getDescription(), masterReceipt.getSuperMarketName());
+                    }
+
+                    if (manualTescoReceiptList.size() != 0 && manualSainsReceiptList.size() != 0) {
+                        System.out.println("record exists in both excel, cannot compare accuracy");
+                    } else if (manualTescoReceiptList.size() != 0) {
+                        selectedManualReceiptList = manualTescoReceiptList;
+                    } else if (manualSainsReceiptList.size() != 0) {
+                        selectedManualReceiptList = manualSainsReceiptList;
+                    } else {
+                        System.out.println("Manul record data not found for this file name cannot compare accuracy");
+                    }
+
+                    int superMarketNameAccuracy = AccuracyTest.verifySuperMarketBrand(masterReceipt.getSuperMarketName(), selectedManualReceiptList);
+
                 }
             }
         }
 
         System.out.println("Ending the batch processing " + new Date());
     }
+
+    public static String doFullTextSearchForLineItems(String lineItem, String superMarketBrand) throws UnknownHostException {
+
+        lineItem = lineItem.trim().replaceAll(" +", " ");
+        String collectionName = "";
+        if (superMarketBrand.equalsIgnoreCase(Configs.TESCO_BRAND_NAME)) {
+            collectionName = DataServiceImpl.manualDataTescoCollection;
+        } else if (superMarketBrand.equalsIgnoreCase(Configs.SAINSBURY_BRAND_NAME)) {
+            collectionName = DataServiceImpl.manualDataSaintsCollection;
+        } else if (superMarketBrand.equalsIgnoreCase("null")) {
+            // TODO search in both DB's and get the highest result
+        }
+
+        List<ManualReceipt> manualReceiptList = DataServiceImpl.doFullTextSearchFromManualData(lineItem, collectionName);
+        if (manualReceiptList.size() != 0) {
+            if (1.4 < manualReceiptList.get(0).getScore()) {
+                lineItem = manualReceiptList.get(0).getTILLROLL_LINE_DESC();
+            }
+        }
+        return lineItem;
+    }
+
 
     public static List<Receipt> performOCRBasedOnProdOrDev(String fileNameWithExtension, String fileNameWithoutExtension) throws IOException, InterruptedException {
         List<Receipt> receiptList;

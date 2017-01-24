@@ -27,13 +27,13 @@ public class DataServiceImpl {
     public static String ocrReceiptCollection;
 
     static {
-        Properties properties = Configs.getConfigs(Configs.CONFIG_FILE_NAME);
-        manualDataDB = properties.getProperty("ocrReceiptDB");
-        manualDataTescoCollection = properties.getProperty("tesco");
-        manualDataSaintsCollection = properties.getProperty("ocrSaintsReceiptCollection");
+        Properties properties = Configs.getConfigs(Configs.DB_CONFIG_FILE_NAME);
+        manualDataDB = properties.getProperty("manualDataDbName");
+        manualDataTescoCollection = properties.getProperty("manualTescoReceiptCollection");
+        manualDataSaintsCollection = properties.getProperty("manualSaintsReceiptCollection");
 
-        ocrDB = properties.getProperty("manualDataDbName");
-        ocrReceiptCollection = properties.getProperty("manualReceiptCollection");
+        ocrDB = properties.getProperty("ocrDBName");
+        ocrReceiptCollection = properties.getProperty("ocrReceiptCollection");
     }
 
 

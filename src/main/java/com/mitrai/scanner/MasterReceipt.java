@@ -12,6 +12,7 @@ public class MasterReceipt implements Serializable {
 
     private String id;
     private String superMarketName;
+    private int superMarketNameAccuracy;
     private List<LineItem> lineItemList;
     private List<Receipt> receiptList;
     private String date;
@@ -86,5 +87,13 @@ public class MasterReceipt implements Serializable {
 
     public void setReceiptList(List<Receipt> receiptList) {
         this.receiptList = receiptList;
+    }
+
+    public int getSuperMarketNameAccuracy() {
+        return superMarketNameAccuracy;
+    }
+
+    public void setSuperMarketNameAccuracy(int superMarketNameAccuracy) {
+        this.superMarketNameAccuracy = superMarketNameAccuracy;
     }
 }

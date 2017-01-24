@@ -55,24 +55,29 @@ public class TemplateEngine {
                 templateScoreMap.put(templateName, scoreArrayForPreProcess[0]);
 
             }
+
             Map<String, Integer> sortedMapAsc = Utils.sortByComparator(templateScoreMap, ASC);
             Map.Entry<String, Integer> entry = sortedMapAsc.entrySet().iterator().next();
             if (entry.getValue() < 2) {
                 String superMarketName = entry.getKey();
                 receipt.setSuperMarketName(superMarketName.toLowerCase().split("_")[0]);
-                receipt.setNameAccuracy(entry.getValue());
             }else {
                 receipt.setSuperMarketName("Null");
             }
+            receipt.setNameAccuracy(entry.getValue());
         }
         Collections.sort(receiptList, new Comparator<Receipt>(){
             public int compare(Receipt r1, Receipt r2) {
                 return r1.getNameAccuracy() - r2.getNameAccuracy();
             }
         });
+
+        // Set the highest accuracy value to the Master Receipt
         masterReceipt.setReceiptList(receiptList);
-        masterReceipt.setSuperMarketName(receiptList.get(receiptList.size()-1).getSuperMarketName());
+        masterReceipt.setSuperMarketName(receiptList.get(0).getSuperMarketName());
+        masterReceipt.setSuperMarketNameAccuracy(receiptList.get(0).getNameAccuracy());
         return masterReceipt;
+
     }
 
     public static void identifyLineItems(List<Receipt> receiptList) {

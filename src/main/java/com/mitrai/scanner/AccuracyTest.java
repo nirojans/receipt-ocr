@@ -8,11 +8,11 @@ import java.util.List;
  */
 public class AccuracyTest {
 
-    public static int verifySuperMarketBrand(String id, String brandName) throws UnknownHostException {
+    public static int verifySuperMarketBrand(String brandName, List<ManualReceipt> manualReceiptList) throws UnknownHostException {
 
-        List<ManualReceipt> manualReceiptList = DataServiceImpl.getReceiptFromManualData(id, DataServiceImpl.manualDataTescoCollection);
-        String manualShopName = manualReceiptList.get(0).getSHOP_NAME();
-        if (manualShopName.contains(manualShopName)) {
+        String manualTescoShopName = manualReceiptList.get(0).getSHOP_NAME().toLowerCase();
+
+        if (manualTescoShopName.contains(brandName)) {
             return 100;
         }
         return 0;
