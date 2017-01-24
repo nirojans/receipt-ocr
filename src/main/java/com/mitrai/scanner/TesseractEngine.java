@@ -24,7 +24,8 @@ public class TesseractEngine {
         TesseractEngine.TerminalImplementation(TesseractEngine.getCommandForTesseract(fileName, method3ScriptName));
 
         // If dev environment keep the files in the raw images with out moving
-        if (FileHelper.isProd) {
+        // If move to raw is set to true give high priority for that
+        if (Configs.moveToArchiveStatus.equalsIgnoreCase("true") || FileHelper.isProd) {
             TesseractEngine.TerminalImplementation(TesseractEngine.getCommandToMoveImageToArchive(fileName, moveFileScriptName));
         }
     }

@@ -29,7 +29,7 @@ public class FileHelper {
     public static String receiptsFolderPath = "";
     public static boolean isProd = false;
 
-    public static int maxRandomFileCount = 10;
+    public static int maxRandomFileCount = 15;
 
     static {
         Properties properties = Configs.getConfigs(Configs.CONFIG_FILE_NAME);

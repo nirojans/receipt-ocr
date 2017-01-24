@@ -60,7 +60,6 @@ public class DataServiceImpl {
 
     public static boolean isRecordExists(DBCollection col, String searchAttribute, String searchValue) {
         DBCursor cursor = col.find(new BasicDBObject(searchAttribute, searchValue));
-        List<ManualReceipt> manualReceiptList = new ArrayList<>();
 
         while(cursor.hasNext()) {
             return true;
@@ -120,8 +119,8 @@ public class DataServiceImpl {
     public static List<MasterReceipt> getOCRMasterReceipt(String searchID, String collectionName) throws UnknownHostException {
 
         MongoClient mongo = new MongoClient("localhost", 27017);
-        DB db = mongo.getDB(ocrDB);
-        DBCollection col = db.getCollection(ocrReceiptCollection);
+        DB mongoOCRDB = mongo.getDB(ocrDB);
+        DBCollection col = mongoOCRDB.getCollection(ocrReceiptCollection);
 
         DBCursor cursor = col.find(new BasicDBObject("id", searchID));
         List<MasterReceipt> masterReceiptList = new ArrayList<>();
@@ -137,6 +136,41 @@ public class DataServiceImpl {
             mongo.close();
         }
         return masterReceiptList;
+    }
+
+    public static boolean getRandomProcessingStatus() throws UnknownHostException {
+
+        boolean randomProcessStatus = false;
+
+        MongoClient mongo = new MongoClient("localhost", 27017);
+        DB configsDB = mongo.getDB("mitra");
+        DBCollection col = configsDB.getCollection("configs");
+
+        List<SystemParameters> systemParametersList = new ArrayList<>();
+
+        DBCursor cursor = col.find(new BasicDBObject("random", true));
+
+        while (cursor.hasNext()) {
+            DBObject dbObject = cursor.next();
+            SystemParameters systemParameters = (new Gson()).fromJson(dbObject.toString(), SystemParameters.class);
+            systemParametersList.add(systemParameters);
+        }
+
+        for (SystemParameters params : systemParametersList) {
+
+            if (params.isRandom()) {
+
+                randomProcessStatus = true;
+
+                BasicDBObject newDocument = new BasicDBObject();
+                newDocument.put("random", false);
+
+                BasicDBObject searchQuery = new BasicDBObject().append("random", true);
+                col.update(searchQuery, newDocument);
+
+            }
+        }
+        return randomProcessStatus;
     }
 
 }

@@ -11,8 +11,11 @@ public class AppMain {
 
     public static void main(String[] args) throws IOException, InterruptedException, SchedulerException {
         System.out.printf("Starting the main application");
-//        List<File> fileList = FileHelper.selectRandomReceipts();
-//        FileHelper.copySelectedReceiptsToRawImageFolder(fileList);
+
+//        if (DataServiceImpl.getRandomProcessingStatus()) {
+//            List<File> fileList = FileHelper.selectRandomReceipts();
+//            FileHelper.copySelectedReceiptsToRawImageFolder(fileList);
+//        }
         cronJob();
     }
 

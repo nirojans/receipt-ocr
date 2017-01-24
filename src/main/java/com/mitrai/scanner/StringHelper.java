@@ -96,7 +96,7 @@ public class StringHelper {
                 String currency     = m.group("currency");
                 String amountString = m.group("amount");
 
-                System.out.format("Desciption: %s%n" + "Currency: %s%n" + "Amount: %s%n", description.trim() , currency
+                System.out.format("Description: %s%n" + "Currency: %s%n" + "Amount: %s%n", description.trim() , currency
                         , amountString);
             }
         }

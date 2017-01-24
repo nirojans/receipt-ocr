@@ -12,13 +12,13 @@ public class Configs {
     public static final String SUPER_MARKET_TEMPLATE_NAME = "template.properties";
 
     public static int maxFileSize;
+    public static String moveToArchiveStatus;
 
     static{
         Properties properties = Configs.getConfigs(Configs.CONFIG_FILE_NAME);
         maxFileSize = Integer.parseInt(properties.getProperty("max_file_size"));
+        moveToArchiveStatus = properties.getProperty("move_images_to_archive_after_processing");
     }
-
-
 
     public static Properties getConfigs(String fileName) {
         ClassLoader loader = Thread.currentThread().getContextClassLoader();

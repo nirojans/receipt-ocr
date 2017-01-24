@@ -58,15 +58,12 @@ public class TemplateEngine {
             Map<String, Integer> sortedMapAsc = Utils.sortByComparator(templateScoreMap, ASC);
             Map.Entry<String, Integer> entry = sortedMapAsc.entrySet().iterator().next();
             if (entry.getValue() < 2) {
-                // TODO split the super market name by _1
                 String superMarketName = entry.getKey();
-                receipt.setSuperMarketName(superMarketName.replace("_1",""));
+                receipt.setSuperMarketName(superMarketName.toLowerCase().split("_")[0]);
                 receipt.setNameAccuracy(entry.getValue());
             }else {
                 receipt.setSuperMarketName("Null");
             }
-
-
         }
         Collections.sort(receiptList, new Comparator<Receipt>(){
             public int compare(Receipt r1, Receipt r2) {
