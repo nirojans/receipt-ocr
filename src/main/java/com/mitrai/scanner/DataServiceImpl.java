@@ -26,6 +26,11 @@ public class DataServiceImpl {
     public static String ocrDB;
     public static String ocrReceiptCollection;
 
+    public static String mitraDB;
+    public static String configsCollection;
+
+    public static String localhost = "localhost";
+
     static {
         Properties properties = Configs.getConfigs(Configs.DB_CONFIG_FILE_NAME);
         manualDataDB = properties.getProperty("manualDataDbName");
@@ -34,6 +39,11 @@ public class DataServiceImpl {
 
         ocrDB = properties.getProperty("ocrDBName");
         ocrReceiptCollection = properties.getProperty("ocrReceiptCollection");
+
+        mitraDB = properties.getProperty("mitraDB");
+        configsCollection = properties.getProperty("configsCollection");
+
+
     }
 
 
@@ -68,7 +78,7 @@ public class DataServiceImpl {
     }
 
     public static List<ManualReceipt> doFullTextSearchFromManualData(String searchTerm, String collectionName) throws UnknownHostException {
-        MongoClient mongo = new MongoClient("localhost", 27017);
+        MongoClient mongo = new MongoClient(localhost, 27017);
         DB db = mongo.getDB(manualDataDB);
         DBCollection col = db.getCollection(collectionName);
 
@@ -96,7 +106,7 @@ public class DataServiceImpl {
 
     public static List<ManualReceipt> getReceiptFromManualData(String searchID, String collectionName) throws UnknownHostException {
 
-        MongoClient mongo = new MongoClient("localhost", 27017);
+        MongoClient mongo = new MongoClient(localhost, 27017);
         DB db = mongo.getDB(manualDataDB);
         DBCollection col = db.getCollection(collectionName);
 
@@ -118,7 +128,7 @@ public class DataServiceImpl {
 
     public static List<MasterReceipt> getOCRMasterReceipt(String searchID, String collectionName) throws UnknownHostException {
 
-        MongoClient mongo = new MongoClient("localhost", 27017);
+        MongoClient mongo = new MongoClient(localhost, 27017);
         DB mongoOCRDB = mongo.getDB(ocrDB);
         DBCollection col = mongoOCRDB.getCollection(ocrReceiptCollection);
 
@@ -142,9 +152,9 @@ public class DataServiceImpl {
 
         boolean randomProcessStatus = false;
 
-        MongoClient mongo = new MongoClient("localhost", 27017);
-        DB configsDB = mongo.getDB("mitra");
-        DBCollection col = configsDB.getCollection("configs");
+        MongoClient mongo = new MongoClient(localhost, 27017);
+        DB configsDB = mongo.getDB(mitraDB);
+        DBCollection col = configsDB.getCollection(configsCollection);
 
         List<SystemParameters> systemParametersList = new ArrayList<>();
 
@@ -173,13 +183,10 @@ public class DataServiceImpl {
         return randomProcessStatus;
     }
 
-    public static void getRandomProcessStatus() throws UnknownHostException {
-
-        MongoClient mongo = new MongoClient("localhost", 27017);
-
-        DB configsDB = mongo.getDB("mitra");
-        DBCollection col = configsDB.getCollection("configs");
-
+    public static boolean getRandomProcessStatus() throws UnknownHostException {
+        MongoClient mongo = new MongoClient(localhost, 27017);
+        DB configsDB = mongo.getDB(mitraDB);
+        DBCollection col = configsDB.getCollection(configsCollection);
 
         DBCursor cursor = col.find(new BasicDBObject("id", "random"));
 
@@ -190,14 +197,32 @@ public class DataServiceImpl {
             systemParametersList.add(systemParameters);
         }
 
-        BasicDBObject searchQuery = new BasicDBObject().append("id", "random");
+        for (SystemParameters params : systemParametersList) {
+            if (params.isStatus()) {
+                BasicDBObject searchQuery = new BasicDBObject().append("id", "random");
+                BasicDBObject updateQuery = new BasicDBObject();
+                updateQuery.append("$set", new BasicDBObject().append("status", false));
+                col.update(searchQuery, updateQuery, false, true);
 
-        BasicDBObject updateQuery = new BasicDBObject();
-        updateQuery.append("$set", new BasicDBObject().append("status", false));
+                return true;
+            }
+        }
+        return false;
+    }
 
-        // hosting is the search query
 
-        col.update(searchQuery, updateQuery, false, true);
+    public static Object getNextSequence() throws Exception{
 
+        MongoClient mongoClient = new MongoClient( localhost , 27017 );
+        // Now connect to your databases
+        DB db = mongoClient.getDB(mitraDB);
+        DBCollection collection = db.getCollection(configsCollection);
+
+        BasicDBObject find = new BasicDBObject();
+        find.put("id", "counter");
+        BasicDBObject update = new BasicDBObject();
+        update.put("$inc", new BasicDBObject("seq", 1));
+        DBObject obj =  collection.findAndModify(find, update);
+        return obj.get("seq");
     }
 }

@@ -12,11 +12,12 @@ public class AppMain {
     public static void main(String[] args) throws IOException, InterruptedException, SchedulerException {
         System.out.printf("Starting the main application");
 
-//        if (DataServiceImpl.getRandomProcessingStatus()) {
-//            List<File> fileList = FileHelper.selectRandomReceipts();
-//            FileHelper.copySelectedReceiptsToRawImageFolder(fileList);
-//        }
-//        cronJob();
+        // If the random batch processing status is true then copy files from tesco and sainsbury and put in the raw folder
+        if (DataServiceImpl.getRandomProcessingStatus()) {
+            List<File> fileList = FileHelper.selectRandomReceipts();
+            FileHelper.copySelectedReceiptsToRawImageFolder(fileList);
+        }
+        cronJob();
         DataServiceImpl.getRandomProcessStatus();
 
     }
