@@ -148,7 +148,7 @@ public class DataServiceImpl {
 
         List<SystemParameters> systemParametersList = new ArrayList<>();
 
-        DBCursor cursor = col.find(new BasicDBObject("random", true));
+        DBCursor cursor = col.find(new BasicDBObject("id", "random"));
 
         while (cursor.hasNext()) {
             DBObject dbObject = cursor.next();
@@ -158,12 +158,12 @@ public class DataServiceImpl {
 
         for (SystemParameters params : systemParametersList) {
 
-            if (params.isRandom()) {
+            if (params.isStatus()) {
 
                 randomProcessStatus = true;
 
                 BasicDBObject newDocument = new BasicDBObject();
-                newDocument.put("random", false);
+                newDocument.put("status", false);
 
                 BasicDBObject searchQuery = new BasicDBObject().append("random", true);
                 col.update(searchQuery, newDocument);
@@ -180,13 +180,24 @@ public class DataServiceImpl {
         DB configsDB = mongo.getDB("mitra");
         DBCollection col = configsDB.getCollection("configs");
 
-        BasicDBObject newDocument = new BasicDBObject();
-        newDocument.append("$set", new BasicDBObject().append("status", true));
 
-        // hosting is the search query
+        DBCursor cursor = col.find(new BasicDBObject("id", "random"));
+
+        List<SystemParameters> systemParametersList = new ArrayList<>();
+        while (cursor.hasNext()) {
+            DBObject dbObject = cursor.next();
+            SystemParameters systemParameters = (new Gson()).fromJson(dbObject.toString(), SystemParameters.class);
+            systemParametersList.add(systemParameters);
+        }
+
         BasicDBObject searchQuery = new BasicDBObject().append("id", "random");
 
-        col.update(searchQuery, newDocument);
+        BasicDBObject updateQuery = new BasicDBObject();
+        updateQuery.append("$set", new BasicDBObject().append("status", false));
+
+        // hosting is the search query
+
+        col.update(searchQuery, updateQuery, false, true);
 
     }
 }

@@ -16,7 +16,9 @@ public class AppMain {
 //            List<File> fileList = FileHelper.selectRandomReceipts();
 //            FileHelper.copySelectedReceiptsToRawImageFolder(fileList);
 //        }
-        cronJob();
+//        cronJob();
+        DataServiceImpl.getRandomProcessStatus();
+
     }
 
     public static void cronJob() throws SchedulerException {

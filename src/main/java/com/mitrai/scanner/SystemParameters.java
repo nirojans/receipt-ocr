@@ -6,14 +6,14 @@ package com.mitrai.scanner;
 public class SystemParameters {
 
     private String id;
-    private boolean random;
+    private boolean status;
 
-    public boolean isRandom() {
-        return random;
+    public boolean isStatus() {
+        return status;
     }
 
-    public void setRandom(boolean random) {
-        this.random = random;
+    public void setStatus(boolean status) {
+        this.status = status;
     }
 
     public String getId() {
