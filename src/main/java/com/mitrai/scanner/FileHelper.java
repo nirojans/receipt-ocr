@@ -27,9 +27,14 @@ public class FileHelper {
     public static String preprocessedFolderPath = "";
     public static String resultsFolderPath = "";
     public static String receiptsFolderPath = "";
+
+    public static String tescoReceiptsFolderPath = "";
+    public static String sainsburyReceiptsFolderPath = "";
+
     public static boolean isProd = false;
 
-    public static int maxRandomFileCount = 15;
+
+    public static int maxRandomFileCount = 10;
 
     static {
         Properties properties = Configs.getConfigs(Configs.CONFIG_FILE_NAME);
@@ -43,6 +48,10 @@ public class FileHelper {
         archivedFolderPath = baseFolderPath + properties.getProperty("archived_image_folder_path");
         preprocessedFolderPath = baseFolderPath + properties.getProperty("preprocessed_image_folder_path");
         resultsFolderPath = baseFolderPath + properties.getProperty("results_folder_path");
+
+        tescoReceiptsFolderPath = baseFolderPath + properties.getProperty("tesco_receipts_folder_path");
+        sainsburyReceiptsFolderPath = baseFolderPath + properties.getProperty("sainsbury_receipts_folder_path");
+
         receiptsFolderPath = properties.getProperty("receipts_folder_path");
     }
 
@@ -147,11 +156,11 @@ public class FileHelper {
         }
     }
 
-    public static List<File> selectRandomReceipts() {
+    public static List<File> selectRandomReceipts(String receiptFolderPathForRandomProcessing) {
 
         List<File> fileList = new ArrayList<>();
 
-        File folder = new File(receiptsFolderPath);
+        File folder = new File(receiptFolderPathForRandomProcessing);
         File[] files = folder.listFiles();
 
         if (files != null) {

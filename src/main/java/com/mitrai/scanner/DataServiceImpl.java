@@ -30,6 +30,7 @@ public class DataServiceImpl {
     public static String configsCollection;
 
     public static String localhost = "localhost";
+    public static int port = 27017;
 
     static {
         Properties properties = Configs.getConfigs(Configs.DB_CONFIG_FILE_NAME);
@@ -49,7 +50,7 @@ public class DataServiceImpl {
 
     public static void insertIntoDB(MasterReceipt masterReceipt) throws UnknownHostException {
 
-        MongoClient mongo = new MongoClient("localhost", 27017);
+        MongoClient mongo = new MongoClient(localhost, port);
 
         DB db = mongo.getDB(ocrDB);
         DBCollection col = db.getCollection(ocrReceiptCollection);
@@ -78,7 +79,7 @@ public class DataServiceImpl {
     }
 
     public static List<ManualReceipt> doFullTextSearchFromManualData(String searchTerm, String collectionName) throws UnknownHostException {
-        MongoClient mongo = new MongoClient(localhost, 27017);
+        MongoClient mongo = new MongoClient(localhost, port);
         DB db = mongo.getDB(manualDataDB);
         DBCollection col = db.getCollection(collectionName);
 
@@ -148,39 +149,34 @@ public class DataServiceImpl {
         return masterReceiptList;
     }
 
-    public static boolean getRandomProcessingStatus() throws UnknownHostException {
+    public static void insertBatchProcessDetails(Result result) throws UnknownHostException {
 
-        boolean randomProcessStatus = false;
+        MongoClient mongo = new MongoClient(localhost, port);
 
-        MongoClient mongo = new MongoClient(localhost, 27017);
-        DB configsDB = mongo.getDB(mitraDB);
-        DBCollection col = configsDB.getCollection(configsCollection);
+        DB db = mongo.getDB(ocrDB);
+        DBCollection col = db.getCollection("result");
 
-        List<SystemParameters> systemParametersList = new ArrayList<>();
+        // get the batch process id
 
-        DBCursor cursor = col.find(new BasicDBObject("id", "random"));
+        // add the receipt to the
 
-        while (cursor.hasNext()) {
-            DBObject dbObject = cursor.next();
-            SystemParameters systemParameters = (new Gson()).fromJson(dbObject.toString(), SystemParameters.class);
-            systemParametersList.add(systemParameters);
-        }
 
-        for (SystemParameters params : systemParametersList) {
 
-            if (params.isStatus()) {
 
-                randomProcessStatus = true;
+        // check if a document exists, If exists remove
+//        if (isRecordExists(col, "id", masterReceipt.getId())) {
+//            BasicDBObject document = new BasicDBObject();
+//            document.put("id", masterReceipt.getId());
+//            col.remove(document);
+//        }
+//
+//        // Insert new document to mongo DB
+//        Gson gson = new Gson();
+//        BasicDBObject obj = (BasicDBObject) JSON.parse(gson.toJson(masterReceipt));
+//        col.insert(obj);
+        mongo.close();
 
-                BasicDBObject newDocument = new BasicDBObject();
-                newDocument.put("status", false);
 
-                BasicDBObject searchQuery = new BasicDBObject().append("random", true);
-                col.update(searchQuery, newDocument);
-
-            }
-        }
-        return randomProcessStatus;
     }
 
     public static boolean getRandomProcessStatus() throws UnknownHostException {

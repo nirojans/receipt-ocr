@@ -14,8 +14,11 @@ public class AppMain {
 
         // If the random batch processing status is true then copy files from tesco and sainsbury and put in the raw folder
         if (DataServiceImpl.getRandomProcessingStatus()) {
-            List<File> fileList = FileHelper.selectRandomReceipts();
-            FileHelper.copySelectedReceiptsToRawImageFolder(fileList);
+            List<File> tescoFileList = FileHelper.selectRandomReceipts(FileHelper.tescoReceiptsFolderPath);
+            List<File> sainsburyFileList = FileHelper.selectRandomReceipts(FileHelper.sainsburyReceiptsFolderPath);
+
+            FileHelper.copySelectedReceiptsToRawImageFolder(tescoFileList);
+            FileHelper.copySelectedReceiptsToRawImageFolder(sainsburyFileList);
         }
         cronJob();
         DataServiceImpl.getRandomProcessStatus();
