@@ -173,18 +173,18 @@ public class DataServiceImpl {
         return randomProcessStatus;
     }
 
-    public static void update() throws UnknownHostException {
+    public static void getRandomProcessStatus() throws UnknownHostException {
 
         MongoClient mongo = new MongoClient("localhost", 27017);
+
         DB configsDB = mongo.getDB("mitra");
-
-        BasicDBObject newDocument = new BasicDBObject();
-        newDocument.append("$set", new BasicDBObject().append("clients", 110));
-
         DBCollection col = configsDB.getCollection("configs");
 
-        // hosting is the serach query
-        BasicDBObject searchQuery = new BasicDBObject().append("hosting", "hostB");
+        BasicDBObject newDocument = new BasicDBObject();
+        newDocument.append("$set", new BasicDBObject().append("status", true));
+
+        // hosting is the search query
+        BasicDBObject searchQuery = new BasicDBObject().append("id", "random");
 
         col.update(searchQuery, newDocument);
 

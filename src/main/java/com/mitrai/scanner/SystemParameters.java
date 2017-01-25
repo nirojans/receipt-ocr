@@ -5,6 +5,7 @@ package com.mitrai.scanner;
  */
 public class SystemParameters {
 
+    private String id;
     private boolean random;
 
     public boolean isRandom() {
@@ -13,5 +14,13 @@ public class SystemParameters {
 
     public void setRandom(boolean random) {
         this.random = random;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }
