@@ -9,19 +9,19 @@ import java.util.List;
 
 public class AppMain {
 
-    public static void main(String[] args) throws IOException, InterruptedException, SchedulerException {
+    public static void main(String[] args) throws Exception {
         System.out.printf("Starting the main application");
 
-        // If the random batch processing status is true then copy files from tesco and sainsbury and put in the raw folder
-        if (DataServiceImpl.getRandomProcessingStatus()) {
-            List<File> tescoFileList = FileHelper.selectRandomReceipts(FileHelper.tescoReceiptsFolderPath);
-            List<File> sainsburyFileList = FileHelper.selectRandomReceipts(FileHelper.sainsburyReceiptsFolderPath);
-
-            FileHelper.copySelectedReceiptsToRawImageFolder(tescoFileList);
-            FileHelper.copySelectedReceiptsToRawImageFolder(sainsburyFileList);
-        }
-        cronJob();
-        DataServiceImpl.getRandomProcessStatus();
+//        // If the random batch processing status is true then copy files from tesco and sainsbury and put in the raw folder
+//        if (DataServiceImpl.getRandomProcessStatus()) {
+//            List<File> tescoFileList = FileHelper.selectRandomReceipts(FileHelper.tescoReceiptsFolderPath);
+//            List<File> sainsburyFileList = FileHelper.selectRandomReceipts(FileHelper.sainsburyReceiptsFolderPath);
+//
+//            FileHelper.copySelectedReceiptsToRawImageFolder(tescoFileList);
+//            FileHelper.copySelectedReceiptsToRawImageFolder(sainsburyFileList);
+//        }
+//        cronJob();
+        DataServiceImpl.getNextSequence();
 
     }
 

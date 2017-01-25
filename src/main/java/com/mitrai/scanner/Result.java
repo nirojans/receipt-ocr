@@ -9,6 +9,7 @@ import java.util.List;
  */
 public class Result implements Serializable {
 
+    private int batchProcessID;
     private List<String> fileNames;
     List<ManualReceipt> manualReceipts = new ArrayList<>();
 
@@ -18,5 +19,21 @@ public class Result implements Serializable {
 
     public void setFileNames(List<String> fileNames) {
         this.fileNames = fileNames;
+    }
+
+    public int getBatchProcessID() {
+        return batchProcessID;
+    }
+
+    public void setBatchProcessID(int batchProcessID) {
+        this.batchProcessID = batchProcessID;
+    }
+
+    public List<ManualReceipt> getManualReceipts() {
+        return manualReceipts;
+    }
+
+    public void setManualReceipts(List<ManualReceipt> manualReceipts) {
+        this.manualReceipts = manualReceipts;
     }
 }

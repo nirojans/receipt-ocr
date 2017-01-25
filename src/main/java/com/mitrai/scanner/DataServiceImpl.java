@@ -78,6 +78,15 @@ public class DataServiceImpl {
         return false;
     }
 
+    public static boolean isRecordExists(DBCollection col, String searchAttribute, int searchValue) {
+        DBCursor cursor = col.find(new BasicDBObject(searchAttribute, searchValue));
+
+        while(cursor.hasNext()) {
+            return true;
+        }
+        return false;
+    }
+
     public static List<ManualReceipt> doFullTextSearchFromManualData(String searchTerm, String collectionName) throws UnknownHostException {
         MongoClient mongo = new MongoClient(localhost, port);
         DB db = mongo.getDB(manualDataDB);
@@ -157,26 +166,21 @@ public class DataServiceImpl {
         DBCollection col = db.getCollection("result");
 
         // get the batch process id
+        int batchProcessID = getNextSequence();
+        result.setBatchProcessID(batchProcessID);
 
-        // add the receipt to the
+        //check if a document exists, If exists remove
+        if (isRecordExists(col, "id", batchProcessID)) {
+            BasicDBObject document = new BasicDBObject();
+            document.put("id", batchProcessID);
+            col.remove(document);
+        }
 
-
-
-
-        // check if a document exists, If exists remove
-//        if (isRecordExists(col, "id", masterReceipt.getId())) {
-//            BasicDBObject document = new BasicDBObject();
-//            document.put("id", masterReceipt.getId());
-//            col.remove(document);
-//        }
-//
-//        // Insert new document to mongo DB
-//        Gson gson = new Gson();
-//        BasicDBObject obj = (BasicDBObject) JSON.parse(gson.toJson(masterReceipt));
-//        col.insert(obj);
+        // Insert new document to mongo DB
+        Gson gson = new Gson();
+        BasicDBObject obj = (BasicDBObject) JSON.parse(gson.toJson(result));
+        col.insert(obj);
         mongo.close();
-
-
     }
 
     public static boolean getRandomProcessStatus() throws UnknownHostException {
@@ -207,7 +211,7 @@ public class DataServiceImpl {
     }
 
 
-    public static Object getNextSequence() throws Exception{
+    public static int getNextSequence() throws UnknownHostException {
 
         MongoClient mongoClient = new MongoClient( localhost , 27017 );
         // Now connect to your databases
@@ -219,6 +223,8 @@ public class DataServiceImpl {
         BasicDBObject update = new BasicDBObject();
         update.put("$inc", new BasicDBObject("seq", 1));
         DBObject obj =  collection.findAndModify(find, update);
-        return obj.get("seq");
+
+        double d = Double.parseDouble(obj.get("seq").toString());
+        return  (int) d;
     }
 }
