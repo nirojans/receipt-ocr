@@ -11,7 +11,11 @@ public class Result implements Serializable {
 
     private int batchProcessID;
     private List<String> fileNames;
-    List<ManualReceipt> manualReceipts = new ArrayList<>();
+    private List<OCRStats> ocrStatsList;
+
+    public Result(int batchProcessID) {
+        this.batchProcessID = batchProcessID;
+    }
 
     public List<String> getFileNames() {
         return fileNames;
@@ -29,11 +33,11 @@ public class Result implements Serializable {
         this.batchProcessID = batchProcessID;
     }
 
-    public List<ManualReceipt> getManualReceipts() {
-        return manualReceipts;
+    public List<OCRStats> getOcrStatsList() {
+        return ocrStatsList;
     }
 
-    public void setManualReceipts(List<ManualReceipt> manualReceipts) {
-        this.manualReceipts = manualReceipts;
+    public void setOcrStatsList(List<OCRStats> ocrStatsList) {
+        this.ocrStatsList = ocrStatsList;
     }
 }

@@ -1,5 +1,6 @@
 package com.mitrai.scanner;
 
+import java.net.InterfaceAddress;
 import java.net.UnknownHostException;
 import java.util.*;
 
@@ -58,27 +59,24 @@ public class AccuracyTest implements Cloneable {
         return lineItem;
     }
 
-    public static ArrayList<LineItem> verifyLineItems(Receipt receipt, List<ManualReceipt> manualReceiptList) {
-
+    public static OCRStats verifyLineItems(OCRStats ocrStats, Receipt receipt, List<ManualReceipt> manualReceiptList) {
         ArrayList<LineItem> predictedLineItems = receipt.getPredictedLineItemFromManualData();
         ArrayList<LineItem> finalLineItems = new ArrayList<>();
-
-        int size = manualReceiptList.size();
 
         // iterate through manual data
         for(int i=0; i < predictedLineItems.size(); i++) {
             // key = manualData Line number , Distance
             try {
                 LineItem lineItem = predictedLineItems.get(i);
-                // TODO handle manual receipt list empty scenario
-
                 // null returned when no match is found from the manual data set
-                LineItem item = identifyAndRemoveFromManualList(manualReceiptList, lineItem);
-                if (item != null) {
-                    finalLineItems.add(item);
+                if (manualReceiptList.size() != 0) {
+                    LineItem item = identifyAndRemoveFromManualList(manualReceiptList, lineItem);
+                    if (item != null) {
+                        finalLineItems.add(item);
+                    }
                 }
             } catch (Exception e) {
-                System.out.println("Array index out of bound exception");
+                System.out.println("Array index out of bound exception " + e);
             }
         }
 
@@ -106,17 +104,34 @@ public class AccuracyTest implements Cloneable {
             valueHistogram[i] = finalLineItems.get(i).getValueAccuracyPercentage();
         }
 
+        // This computes the histogram (min,max,bucketsize, valuesForHistogram)
+        int[] histogramDesc = histogram(0, 100, 10, descriptionHistogram);
+        int[] histogramValue = histogram(0, 100, 10, valueHistogram);
 
-
-        int[] histogramDesc = histogram(0, 100, 10, 10, descriptionHistogram);
-        int[] histogramValue = histogram(0, 100, 10, 10, valueHistogram);
-
+        // TODO convert possible line items through the maual data set
         // add the missed items to the accuracy test
         histogramDesc[0] = histogramDesc[0] + manualReceiptList.size();
         histogramValue[0] = histogramValue[0] + manualReceiptList.size();
 
-        List<String[]> stringList = finalResultsInStringArray(finalLineItems);
-        return finalLineItems;
+        // remove the zero elements from the histogram
+        HashMap<Integer, Integer> histogramAccuracyMap = new HashMap<>();
+        HashMap<Integer, Integer> valueAccuracyMap = new HashMap<>();
+
+        for(int i=0;i<histogramDesc.length;i++) {
+
+            if (histogramDesc[i] != 0) {
+                histogramAccuracyMap.put(i,histogramDesc[i]);
+            }
+            if (histogramValue[i] != 0) {
+                valueAccuracyMap.put(i,histogramValue[i]);
+            }
+        }
+
+        ocrStats.setDescriptionHistogram(histogramAccuracyMap);
+        ocrStats.setValueHistogram(valueAccuracyMap);
+        ocrStats.setDescriptionValueStats(finalResultsInStringArray(finalLineItems));
+
+        return ocrStats;
     }
 
     public static List<String[]> finalResultsInStringArray(List<LineItem> finalLineItems){
@@ -132,7 +147,7 @@ public class AccuracyTest implements Cloneable {
         return stringList;
     }
 
-    public static int[] histogram(final int min, final int max, final int bucket, final int count, int[] array) {
+    public static int[] histogram(final int min, final int max, final int bucket, int[] array) {
         // note, in this method, there's no need to know the actual values, just the range.
         final int range = max - min + 1;
         final int buckets = (range + bucket - 1) / bucket;

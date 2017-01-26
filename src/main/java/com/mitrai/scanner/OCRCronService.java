@@ -24,6 +24,11 @@ public class OCRCronService {
             System.out.println("No files found to be processed");
         }
 
+        // TODO get batch Process ID
+        Result result = new Result(DataServiceImpl.getNextSequence());
+
+        List<OCRStats> ocrStatsList = new ArrayList<>();
+
         for (int i = 0; i < listOfFiles.length; i++) {
             if (listOfFiles[i].isFile()) {
                 String fileNameWithExtension = listOfFiles[i].getName();
@@ -51,7 +56,8 @@ public class OCRCronService {
 
                     masterReceipt.setLineItemList(highReceipt.getLineItems());
                     DataServiceImpl.insertIntoDB(masterReceipt);
-                    List<String> stringList = getLineItemsInStringArray(highReceipt.getLineItems());
+
+//                    List<String> stringList = getLineItemsInStringArray(highReceipt.getLineItems());
                     // get Manual receipt data to compare
                     List<ManualReceipt> manualTescoReceiptList = DataServiceImpl.getReceiptFromManualData(fileNameWithoutExtension, DataServiceImpl.manualDataTescoCollection);
                     List<ManualReceipt> manualSainsReceiptList = DataServiceImpl.getReceiptFromManualData(fileNameWithoutExtension, DataServiceImpl.manualDataSaintsCollection);
@@ -79,20 +85,20 @@ public class OCRCronService {
                     } else if (manualSainsReceiptList.size() != 0) {
                         selectedManualReceiptList = manualSainsReceiptList;
                     } else {
-                        System.out.println("Manul record data not found for this file name cannot compare accuracy");
+                        System.out.println("Manual record data not found for this file name cannot compare accuracy");
                     }
 
-                    List<String> manualArray = getLineManualItemsInStringArray(selectedManualReceiptList);
-                    int superMarketNameAccuracy = AccuracyTest.verifySuperMarketBrand(masterReceipt.getSuperMarketName(), selectedManualReceiptList);
-
+//                    List<String> manualArray = getLineManualItemsInStringArray(selectedManualReceiptList);
+                    OCRStats ocrStats = new OCRStats(fileNameWithoutExtension);
+                    ocrStats.setBrandAccuracy(AccuracyTest.verifySuperMarketBrand(masterReceipt.getSuperMarketName(), selectedManualReceiptList));
 
                     // implement method to calculate line items accuracy for identified Line items
-                    AccuracyTest.verifyLineItems(highReceipt, selectedManualReceiptList);
-                    String name = "niro";
+                    AccuracyTest.verifyLineItems(ocrStats, highReceipt, selectedManualReceiptList);
+                    ocrStatsList.add(ocrStats);
                 }
             }
         }
-
+        result.setOcrStatsList(ocrStatsList);
         System.out.println("Ending the batch processing " + new Date());
     }
 
