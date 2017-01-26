@@ -45,11 +45,13 @@ public class OCRCronService {
                     masterReceipt.setReceiptList(receiptList);
 
                     Receipt highReceipt = receiptList.get(receiptList.size()-1);
-                    FileHelper.writeResultsToFile(highReceipt, fileNameWithoutExtension + "_results.txt");
+                    highReceipt = TemplateEngine.removeAppostrofeFromLineItems(highReceipt);
+
+//                    FileHelper.writeResultsToFile(highReceipt, fileNameWithoutExtension + "_results.txt");
 
                     masterReceipt.setLineItemList(highReceipt.getLineItems());
                     DataServiceImpl.insertIntoDB(masterReceipt);
-
+                    List<String> stringList = getLineItemsInStringArray(highReceipt.getLineItems());
                     // get Manual receipt data to compare
                     List<ManualReceipt> manualTescoReceiptList = DataServiceImpl.getReceiptFromManualData(fileNameWithoutExtension, DataServiceImpl.manualDataTescoCollection);
                     List<ManualReceipt> manualSainsReceiptList = DataServiceImpl.getReceiptFromManualData(fileNameWithoutExtension, DataServiceImpl.manualDataSaintsCollection);
@@ -80,17 +82,36 @@ public class OCRCronService {
                         System.out.println("Manul record data not found for this file name cannot compare accuracy");
                     }
 
+                    List<String> manualArray = getLineManualItemsInStringArray(selectedManualReceiptList);
                     int superMarketNameAccuracy = AccuracyTest.verifySuperMarketBrand(masterReceipt.getSuperMarketName(), selectedManualReceiptList);
 
 
                     // implement method to calculate line items accuracy for identified Line items
                     AccuracyTest.verifyLineItems(highReceipt, selectedManualReceiptList);
-
+                    String name = "niro";
                 }
             }
         }
 
         System.out.println("Ending the batch processing " + new Date());
+    }
+
+    public static List<String> getLineItemsInStringArray(List<LineItem> lineItems){
+        List<String> stringList = new ArrayList<>();
+        for (LineItem item : lineItems) {
+            String desc = item.getDescription() + " | " + item.getValue();
+            stringList.add(desc);
+        }
+        return stringList;
+    }
+
+    public static List<String> getLineManualItemsInStringArray(List<ManualReceipt> manualReceiptList){
+        List<String> stringList = new ArrayList<>();
+        for (ManualReceipt item : manualReceiptList) {
+            String desc = item.getTILLROLL_LINE_DESC() + " | " + item.getLINE_PRICE();
+            stringList.add(desc);
+        }
+        return stringList;
     }
 
     public static String doFullTextSearchForLineItems(String lineItem, String superMarketBrand) throws UnknownHostException {

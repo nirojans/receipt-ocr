@@ -7,6 +7,7 @@ import java.io.Serializable;
  */
 public class ManualReceipt implements Serializable {
 
+    private int recordID;
     private String TILLROLL_DOC_ID;
     private String SHOP_NAME;
     private String TILLROLL_LINE_DESC;
@@ -70,5 +71,13 @@ public class ManualReceipt implements Serializable {
 
     public void setLINE_PRICE(String LINE_PRICE) {
         this.LINE_PRICE = LINE_PRICE;
+    }
+
+    public int getRecordID() {
+        return recordID;
+    }
+
+    public void setRecordID(int recordID) {
+        this.recordID = recordID;
     }
 }

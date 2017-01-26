@@ -102,10 +102,12 @@ public class DataServiceImpl {
         List<ManualReceipt> manualReceiptList = new ArrayList<>();
 
         try {
+
             while(cursor.hasNext()) {
                 DBObject dbObject = cursor.next();
                 ManualReceipt manualReceipt = (new Gson()).fromJson(dbObject.toString(), ManualReceipt.class);
                 manualReceiptList.add(manualReceipt);
+
             }
         } finally {
             cursor.close();
@@ -124,9 +126,12 @@ public class DataServiceImpl {
         List<ManualReceipt> manualReceiptList = new ArrayList<>();
 
         try {
+            int i = 1;
             while(cursor.hasNext()) {
                 DBObject dbObject = cursor.next();
                 ManualReceipt manualReceipt = (new Gson()).fromJson(dbObject.toString(), ManualReceipt.class);
+                i = i + 1;
+                manualReceipt.setRecordID(i);
                 manualReceiptList.add(manualReceipt);
             }
         } finally {

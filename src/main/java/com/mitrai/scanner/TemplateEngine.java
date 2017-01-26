@@ -1,6 +1,5 @@
 package com.mitrai.scanner;
 
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -9,6 +8,23 @@ import java.util.*;
 public class TemplateEngine {
 
     public static boolean ASC = true;
+
+    public static Receipt removeAppostrofeFromLineItems(Receipt highReceipt) {
+
+        List<LineItem> lineItemList = highReceipt.getLineItems();
+        String description;
+
+        for (LineItem item : lineItemList) {
+
+            description = item.getDescription().replace("'", " ");
+            description = description.replace("’", " ");
+            description = description.trim().replaceAll(" +", " ");
+            item.setDescription(description);
+
+        }
+
+        return highReceipt;
+    }
 
     public static MasterReceipt identifyTemplateProperties(MasterReceipt masterReceipt) {
 
@@ -81,7 +97,7 @@ public class TemplateEngine {
     }
 
     public static void identifyLineItems(List<Receipt> receiptList) {
-        String currencySymbol = "£|€";
+        String currencySymbol = "£|€|$";
 
         String regex = "(?<description>.+)\\s{2,}(?<currency>"+currencySymbol+"|\\w)(?<amount>\\d+\\.\\d{2})";
         String strongRegex = "(?<description>.+)\\s{2,}(?<currency>"+currencySymbol+")(?<amount>\\d+\\.\\d{2})";
