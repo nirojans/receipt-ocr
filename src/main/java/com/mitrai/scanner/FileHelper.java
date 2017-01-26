@@ -128,7 +128,7 @@ public class FileHelper {
                 receipt.setRawData(FileHelper.readFile(FileHelper.resultsFolderPath + FilenameUtils.removeExtension(fileName) + "_" + i));
                 // Fix for array index out of bound problem
                 if (receipt.getRawData().length == 0) {
-                    break;
+                    continue;
                 }
                 receipt.setPreprocessMethod(i);
                 receipt.setId(nameOfTheFile);

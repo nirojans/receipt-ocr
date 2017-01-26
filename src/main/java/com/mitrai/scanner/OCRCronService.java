@@ -1,5 +1,7 @@
 package com.mitrai.scanner;
 
+import javax.xml.crypto.Data;
+import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
 import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -38,20 +40,32 @@ public class OCRCronService {
                 if (extensionName.equalsIgnoreCase("jpeg") || extensionName.equalsIgnoreCase("jpg") || extensionName.equalsIgnoreCase("png")) {
 
                     List<Receipt> receiptList = performOCRBasedOnProdOrDev(fileNameWithExtension, fileNameWithoutExtension);
-
+                    OCRStats ocrStats = new OCRStats(fileNameWithoutExtension);
                     // read all text
                     receiptList = FileHelper.readAllResultsForAImage(fileNameWithoutExtension);
+
+                    if (receiptList.size() == 0) {
+                        ocrStats.setStatus(Configs.CANNOT_PROCESS);
+                        ocrStatsList.add(ocrStats);
+                        continue;
+                    }
 
                     MasterReceipt masterReceipt = new MasterReceipt(fileNameWithoutExtension);
                     masterReceipt = TemplateEngine.identifySuperMarketName(receiptList, masterReceipt);
 
+                    String superMarketBrand = masterReceipt.getSuperMarketName();
                     TemplateEngine.identifyLineItems(receiptList);
 
                     masterReceipt.setReceiptList(receiptList);
 
                     Receipt highReceipt = receiptList.get(receiptList.size()-1);
-                    highReceipt = TemplateEngine.removeAppostrofeFromLineItems(highReceipt);
+                    if (highReceipt.getLineItems().size() == 0) {
+                        ocrStats.setStatus(Configs.CANNOT_PROCESS);
+                        ocrStatsList.add(ocrStats);
+                        continue;
+                    }
 
+                    highReceipt = TemplateEngine.removeAppostrofeFromLineItems(highReceipt);
 //                    FileHelper.writeResultsToFile(highReceipt, fileNameWithoutExtension + "_results.txt");
 
                     masterReceipt.setLineItemList(highReceipt.getLineItems());
@@ -64,17 +78,22 @@ public class OCRCronService {
 
                     List<ManualReceipt> selectedManualReceiptList = new ArrayList<>();
 
-                    // Do the full text search for the Line Items identified
+                    // Do the full text search for the Line Items identified with highest accuracy
                     ArrayList<LineItem> predictedLineItemList = new ArrayList<>();
-                    for (LineItem item : highReceipt.getLineItems()) {
+                    try {
+                        for (LineItem item : highReceipt.getLineItems()) {
 
-                        String output = doFullTextSearchForLineItems(item.getDescription(), masterReceipt.getSuperMarketName());
+                            String output = doFullTextSearchForLineItems(item.getDescription(), superMarketBrand);
 
-                        LineItem predictedItems = new LineItem();
-                        predictedItems.setValue(item.getValue());
-                        predictedItems.setDescription(output);
-                        predictedLineItemList.add(predictedItems);
+                            LineItem predictedItems = new LineItem();
+                            predictedItems.setValue(item.getValue());
+                            predictedItems.setDescription(output);
+                            predictedLineItemList.add(predictedItems);
+                        }
+                    } catch (Exception e) {
+                        System.out.printf(e.toString());
                     }
+
 
                     highReceipt.setPredictedLineItemFromManualData(predictedLineItemList);
 
@@ -86,12 +105,14 @@ public class OCRCronService {
                         selectedManualReceiptList = manualSainsReceiptList;
                     } else {
                         System.out.println("Manual record data not found for this file name cannot compare accuracy");
+                        ocrStats.setStatus("NO MANUAL RECORD FOUND FOR ACCURACY CHECK");
+                        ocrStatsList.add(ocrStats);
+                        continue;
                     }
 
 //                    List<String> manualArray = getLineManualItemsInStringArray(selectedManualReceiptList);
-                    OCRStats ocrStats = new OCRStats(fileNameWithoutExtension);
-                    ocrStats.setBrandAccuracy(AccuracyTest.verifySuperMarketBrand(masterReceipt.getSuperMarketName(), selectedManualReceiptList));
 
+                    ocrStats.setBrandAccuracy(AccuracyTest.verifySuperMarketBrand(masterReceipt.getSuperMarketName(), selectedManualReceiptList));
                     // implement method to calculate line items accuracy for identified Line items
                     AccuracyTest.verifyLineItems(ocrStats, highReceipt, selectedManualReceiptList);
                     ocrStatsList.add(ocrStats);
@@ -99,6 +120,7 @@ public class OCRCronService {
             }
         }
         result.setOcrStatsList(ocrStatsList);
+        DataServiceImpl.insertBatchProcessDetails(result);
         System.out.println("Ending the batch processing " + new Date());
     }
 
@@ -128,13 +150,29 @@ public class OCRCronService {
             collectionName = DataServiceImpl.manualDataTescoCollection;
         } else if (superMarketBrand.equalsIgnoreCase(Configs.SAINSBURY_BRAND_NAME)) {
             collectionName = DataServiceImpl.manualDataSaintsCollection;
-        } else if (superMarketBrand.equalsIgnoreCase("null")) {
+        } else if (superMarketBrand.equalsIgnoreCase(Configs.NULL_STRING)) {
             // TODO search in both DB's and get the highest result
+            List<ManualReceipt> tescoManualReceiptList = DataServiceImpl.doFullTextSearchFromManualData(lineItem.trim(), DataServiceImpl.manualDataTescoCollection);
+            List<ManualReceipt> sainsManualReceiptList = DataServiceImpl.doFullTextSearchFromManualData(lineItem.trim(), DataServiceImpl.manualDataSaintsCollection);
+
+
+            if (tescoManualReceiptList.size() != 0 && sainsManualReceiptList.size() != 0) {
+
+                double tescoScore = tescoManualReceiptList.get(0).getScore();
+                double sainsScore = sainsManualReceiptList.get(0).getScore();
+
+                if (tescoScore > sainsScore && Configs.FULL_TEXT_THRESHOLD_SCORE <= tescoScore) {
+                    return tescoManualReceiptList.get(0).getTILLROLL_LINE_DESC().trim();
+                } else if(Configs.FULL_TEXT_THRESHOLD_SCORE <= sainsScore){
+                    return sainsManualReceiptList.get(0).getTILLROLL_LINE_DESC().trim();
+                }
+            }
+            return lineItem;
         }
 
         List<ManualReceipt> manualReceiptList = DataServiceImpl.doFullTextSearchFromManualData(lineItem.trim(), collectionName);
         if (manualReceiptList.size() != 0) {
-            if (1 <= manualReceiptList.get(0).getScore()) {
+            if (Configs.FULL_TEXT_THRESHOLD_SCORE <= manualReceiptList.get(0).getScore()) {
                 lineItem = manualReceiptList.get(0).getTILLROLL_LINE_DESC().trim();
             }
         }

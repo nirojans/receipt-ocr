@@ -170,14 +170,14 @@ public class DataServiceImpl {
         DB db = mongo.getDB(ocrDB);
         DBCollection col = db.getCollection("result");
 
-        // get the batch process id
-        int batchProcessID = getNextSequence();
-        result.setBatchProcessID(batchProcessID);
+//         get the batch process id
+//        int batchProcessID = getNextSequence();
+//        result.setBatchProcessID(batchProcessID);
 
         //check if a document exists, If exists remove
-        if (isRecordExists(col, "id", batchProcessID)) {
+        if (isRecordExists(col, "id", result.getBatchProcessID())) {
             BasicDBObject document = new BasicDBObject();
-            document.put("id", batchProcessID);
+            document.put("id", result.getBatchProcessID());
             col.remove(document);
         }
 

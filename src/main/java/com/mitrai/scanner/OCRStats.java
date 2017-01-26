@@ -10,6 +10,7 @@ import java.util.Map;
 public class OCRStats implements Serializable{
 
     private String id;
+    private String status;
     private List<String[]> descriptionValueStats;
     private Map<Integer, Integer> descriptionHistogram;
     private Map<Integer, Integer> valueHistogram;
@@ -57,5 +58,13 @@ public class OCRStats implements Serializable{
 
     public void setBrandAccuracy(int brandAccuracy) {
         this.brandAccuracy = brandAccuracy;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

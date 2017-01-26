@@ -48,7 +48,7 @@ public class AccuracyTest implements Cloneable {
         if (accuracyLevel <= maxDifference) {
 
             lineItem.setManualDataForLineItem(manualDataLineNumber, accuracyLevel, manualReceiptList.get(entry.getKey()));
-            int accuracyPercentage = (length - lineItem.getDescriptionAccuracyLevel()) * 100 / length;
+            int accuracyPercentage = Math.abs(length - lineItem.getDescriptionAccuracyLevel()) * 100 / length;
             lineItem.setDescriptionAccuracyPercentage(accuracyPercentage);
 
             manualReceiptList.remove(manualDataLineNumber);
@@ -87,7 +87,7 @@ public class AccuracyTest implements Cloneable {
                 // This removes the trailing zeros from the value (Because the excel sheet does not have trailing zeros)
                 value = value.indexOf(".") < 0 ? value : value.replaceAll("0*$", "").replaceAll("\\.$", "");
                 finalLineItem.setValueAccuracyLevel(StringHelper.distance(value, finalLineItem.getManualDataValue()));
-                int valueAccuracyPercentage = (value.length() - finalLineItem.getValueAccuracyLevel()) * 100 / value.length();
+                int valueAccuracyPercentage = Math.abs((value.length() - finalLineItem.getValueAccuracyLevel())) * 100 / value.length();
                 finalLineItem.setValueAccuracyPercentage(valueAccuracyPercentage);
                 finalLineItem.setValue(value);
             } catch (Exception e) {

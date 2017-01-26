@@ -52,8 +52,8 @@ public class TemplateEngine {
 
             for(String key : properties.stringPropertyNames()) {
 
-                // eg - templateName = TESCO
-                String templateName = properties.getProperty(key);
+                // eg - templateNameIdentifier = TESCO/ clubcard statement
+                String templateNameIdentifier = properties.getProperty(key);
                 // create an integer array to save the string similarity score and fill with mx 50 value
                 int[] scoreArrayForPreProcess = new int[ocrResults.length];
                 Arrays.fill(scoreArrayForPreProcess, 50);
@@ -61,14 +61,14 @@ public class TemplateEngine {
                 // Iterate through the raw data of the preprocessed receipts
                 for(int j=0; j < ocrResults.length; j++) {
                     // If the raw data is twice as big as the template name then do not consider
-                    if ((templateName.length() * 2) >= ocrResults[j].length()) {
-                        scoreArrayForPreProcess[j] = StringHelper.distance(templateName, ocrResults[j].toLowerCase());
+                    if ((templateNameIdentifier.length() * 2) >= ocrResults[j].length()) {
+                        scoreArrayForPreProcess[j] = StringHelper.distance(templateNameIdentifier, ocrResults[j].toLowerCase());
                     }
                 }
 
                 // sort the array and get the first element to get the best match score
                 Arrays.sort(scoreArrayForPreProcess);
-                templateScoreMap.put(templateName, scoreArrayForPreProcess[0]);
+                templateScoreMap.put(key, scoreArrayForPreProcess[0]);
 
             }
 
@@ -78,7 +78,7 @@ public class TemplateEngine {
                 String superMarketName = entry.getKey();
                 receipt.setSuperMarketName(superMarketName.toLowerCase().split("_")[0]);
             }else {
-                receipt.setSuperMarketName("Null");
+                receipt.setSuperMarketName(Configs.NULL_STRING);
             }
             receipt.setNameAccuracy(entry.getValue());
         }
@@ -93,7 +93,6 @@ public class TemplateEngine {
         masterReceipt.setSuperMarketName(receiptList.get(0).getSuperMarketName());
         masterReceipt.setSuperMarketNameAccuracy(receiptList.get(0).getNameAccuracy());
         return masterReceipt;
-
     }
 
     public static void identifyLineItems(List<Receipt> receiptList) {
