@@ -83,6 +83,7 @@ public class Utils {
             finalLineItem.setDescription(item.getDescription());
             finalLineItem.setValue(item.getValue());
             finalLineItemList.add(finalLineItem);
+            finalLineItem.setLineNumber(item.getLineNumber());
         }
         return finalLineItemList;
     }
@@ -94,6 +95,7 @@ public class Utils {
             FinalLineItem finalLineItem = new FinalLineItem();
             finalLineItem.setDescription(item.getTILLROLL_LINE_DESC());
             finalLineItem.setValue(item.getLINE_PRICE());
+            finalLineItem.setLineNumber(item.getRecordID());
             finalLineItemList.add(finalLineItem);
         }
 

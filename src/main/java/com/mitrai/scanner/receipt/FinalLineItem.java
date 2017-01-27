@@ -7,6 +7,7 @@ public class FinalLineItem {
 
     private String description;
     private String value;
+    private int lineNumber;
 
     public String getDescription() {
         return description;
@@ -22,5 +23,13 @@ public class FinalLineItem {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public int getLineNumber() {
+        return lineNumber;
+    }
+
+    public void setLineNumber(int lineNumber) {
+        this.lineNumber = lineNumber;
     }
 }

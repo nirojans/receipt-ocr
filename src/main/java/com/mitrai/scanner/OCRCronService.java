@@ -91,6 +91,7 @@ public class OCRCronService {
                             LineItem predictedItems = new LineItem();
                             predictedItems.setValue(item.getValue());
                             predictedItems.setDescription(output);
+                            predictedItems.setLineNumber(item.getLineNumber());
                             predictedLineItemList.add(predictedItems);
                         }
                     } catch (Exception e) {
@@ -128,14 +129,13 @@ public class OCRCronService {
                 }
             }
         }
-//        result.setOcrStatsList(ocrStatsList);
-
         System.out.println("Ending the batch processing " + new Date());
     }
 
 
     public static String doFullTextSearchForLineItems(String lineItem, String superMarketBrand) throws UnknownHostException {
 
+        // removes extra space and replace it with a single space
         lineItem = lineItem.trim().replaceAll(" +", " ");
         String collectionName = "";
         if (superMarketBrand.equalsIgnoreCase(Configs.TESCO_BRAND_NAME)) {

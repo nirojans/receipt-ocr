@@ -126,7 +126,7 @@ public class DataServiceImpl {
         List<ManualReceiptLineItem> manualReceiptLineItemList = new ArrayList<>();
 
         try {
-            int i = 1;
+            int i = 0;
             while(cursor.hasNext()) {
                 DBObject dbObject = cursor.next();
                 ManualReceiptLineItem manualReceiptLineItem = (new Gson()).fromJson(dbObject.toString(), ManualReceiptLineItem.class);
