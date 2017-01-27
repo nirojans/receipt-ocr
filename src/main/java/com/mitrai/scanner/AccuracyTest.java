@@ -13,29 +13,28 @@ import static com.mitrai.scanner.TemplateEngine.ASC;
  */
 public class AccuracyTest implements Cloneable {
 
-    public static int desPer = 95;
-    public static int valPer = 5;
-
-    public static ScoreSummary calculateLineItemScore(ScoreSummary scoreSummary, int[] des, int[] val, int totalLineItems){
+    public static ScoreSummary calculateLineItemScore(ScoreSummary scoreSummary, int[] descriptionAccuracyArray, int[] valueAccuracyArray, int totalLineItems){
 
         // calculate line item accuracy
         List<LineScore> lineScoreList = new ArrayList<>();
         double totalScore = 0;
 
-        for(int i=0;i< des.length; i++) {
+        for(int i=0;i< descriptionAccuracyArray.length; i++) {
 
-            double descriptionScore = (des[i] * desPer) / 100;
-            double valueScore = (val[i] * valPer) / 100;
+//            double descriptionScore = (descriptionAccuracyArray[i] * Configs.LINE_ITEMS_DESC_WEIGHT) / 100;
+//            double valueScore = (valueAccuracyArray[i] * Configs.LINE_ITEMS_VAL_WEIGHT) / 100;
 
-            double score = ((des[i] * Configs.LINE_ITEMS_DESC_WEIGHT) + (val[i] * Configs.LINE_ITEMS_VAL_WEIGHT))/100;
-            double weightScore = score * Configs.LINE_ITEMS_WEIGHT/100;
-            totalScore += weightScore;
+            // ((description *  desc weight) + (value * val weight))/100
+            double lineItemScore = ((descriptionAccuracyArray[i] * Configs.LINE_ITEMS_DESC_WEIGHT) + (valueAccuracyArray[i] * Configs.LINE_ITEMS_VAL_WEIGHT))/100;
+            double lineItemWeightedScore = lineItemScore * Configs.LINE_ITEMS_WEIGHT/100;
+
+            totalScore += lineItemWeightedScore;
             LineScore lineScorePoint = new LineScore();
 
-            lineScorePoint.setDesc(String.valueOf((int)descriptionScore));
-            lineScorePoint.setValue(String.valueOf((int)valueScore));
+            lineScorePoint.setDesc(String.valueOf(descriptionAccuracyArray[i]));
+            lineScorePoint.setValue(String.valueOf(valueAccuracyArray[i]));
 
-            lineScorePoint.setTotalScore(String.valueOf((int)weightScore));
+            lineScorePoint.setTotalScore(String.valueOf((int)lineItemWeightedScore));
             lineScoreList.add(lineScorePoint);
         }
 
@@ -44,13 +43,32 @@ public class AccuracyTest implements Cloneable {
         return scoreSummary;
     }
 
+    public static ScoreSummary calculateFinalScore(ScoreSummary scoreSummary) {
+
+        int totalScore = 0;
+
+        totalScore += scoreSummary.getSuperMarketNameScore();
+        totalScore += scoreSummary.getReceiptTotalScore();
+        totalScore += scoreSummary.getLineItemScore();
+
+        scoreSummary.setTotalScore(totalScore);
+        return scoreSummary;
+    }
+
+    public static ScoreSummary verifyReceiptTotalScore(ScoreSummary scoreSummary) {
+
+        scoreSummary.setReceiptTotalScore(0);
+        return scoreSummary;
+    }
+
     public static ScoreSummary verifySuperMarketBrand(ScoreSummary scoreSummary, String brandName, List<ManualReceipt> manualReceiptList) throws UnknownHostException {
 
         String manualTescoShopName = manualReceiptList.get(0).getSHOP_NAME().toLowerCase();
         if (manualTescoShopName.contains(brandName)) {
             scoreSummary.setSuperMarketNameScore(Configs.MARKETNAME_SCORE_WEIGHT);
+        } else {
+            scoreSummary.setSuperMarketNameScore(0);
         }
-        scoreSummary.setSuperMarketNameScore(0);
         return scoreSummary;
     }
 
@@ -99,6 +117,8 @@ public class AccuracyTest implements Cloneable {
         ArrayList<LineItem> predictedLineItems = receipt.getPredictedLineItemFromManualData();
         ArrayList<LineItem> finalLineItems = new ArrayList<>();
 
+        int totalManualLineItemSize = manualLineItemsList.size();
+
         // iterate through manual data
         for(int i=0; i < predictedLineItems.size(); i++) {
             // key = manualData Line number , Distance
@@ -141,7 +161,7 @@ public class AccuracyTest implements Cloneable {
         }
 
         //
-        calculateLineItemScore(scoreSummary,descriptionHistogram, valueHistogram, manualLineItemsList.size());
+        calculateLineItemScore(scoreSummary,descriptionHistogram, valueHistogram, totalManualLineItemSize);
 
         // This computes the histogram (min,max,bucketsize, valuesForHistogram)
         int[] histogramDesc = histogram(0, 100, 10, descriptionHistogram);

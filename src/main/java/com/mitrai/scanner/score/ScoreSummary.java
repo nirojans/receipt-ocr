@@ -1,16 +1,17 @@
 package com.mitrai.scanner.score;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by nirojans on 1/27/17.
  */
-public class ScoreSummary {
+public class ScoreSummary implements Serializable {
 
-    private int totalScore;
-    private int superMarketNameScore;
-    private int lineTotalScore;
-    private int lineItemScore;
+    private int totalScore = 0 ;
+    private int superMarketNameScore = 0 ;
+    private int receiptTotalScore = 0 ;
+    private int lineItemScore = 0 ;
     private List<LineScore> lineLineScoreList;
 
     public int getTotalScore() {
@@ -29,12 +30,12 @@ public class ScoreSummary {
         this.superMarketNameScore = superMarketNameScore;
     }
 
-    public int getLineTotalScore() {
-        return lineTotalScore;
+    public int getReceiptTotalScore() {
+        return receiptTotalScore;
     }
 
-    public void setLineTotalScore(int lineTotalScore) {
-        this.lineTotalScore = lineTotalScore;
+    public void setReceiptTotalScore(int receiptTotalScore) {
+        this.receiptTotalScore = receiptTotalScore;
     }
 
     public int getLineItemScore() {

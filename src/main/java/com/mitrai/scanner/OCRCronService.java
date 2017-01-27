@@ -117,7 +117,8 @@ public class OCRCronService {
                     ScoreSummary scoreSummary = new ScoreSummary();
                     AccuracyTest.verifySuperMarketBrand(scoreSummary, masterReceipt.getSuperMarketName(), selectedManualReceiptList);
                     AccuracyTest.verifyLineItems(scoreSummary, ocrStats, highReceipt, selectedManualReceiptList);
-
+                    AccuracyTest.verifyReceiptTotalScore(scoreSummary);
+                    AccuracyTest.calculateFinalScore(scoreSummary);
                     ocrStatsList.add(ocrStats);
                 }
             }

@@ -1,5 +1,7 @@
 package com.mitrai.scanner;
 
+import com.mitrai.scanner.score.ScoreSummary;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +14,7 @@ public class Result implements Serializable {
     private int batchProcessID;
     private List<String> fileNames;
     private List<OCRStats> ocrStatsList;
+    private ScoreSummary scoreSummary;
 
     public Result(int batchProcessID) {
         this.batchProcessID = batchProcessID;

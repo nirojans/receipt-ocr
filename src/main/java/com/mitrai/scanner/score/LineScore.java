@@ -1,9 +1,11 @@
 package com.mitrai.scanner.score;
 
+import java.io.Serializable;
+
 /**
  * Created by nirojans on 1/26/17.
  */
-public class LineScore {
+public class LineScore implements Serializable{
 
     private String totalScore;
     private String desc;
