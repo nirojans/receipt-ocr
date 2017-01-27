@@ -10,6 +10,47 @@ import java.util.regex.Pattern;
  */
 public class StringHelper {
 
+    public static boolean regexForDescAndLongSpace(LineItem lineItem) {
+        String descriptionWithDecimalRegex = "(?<description>.+)\\s{2,}";
+        Pattern p = Pattern.compile(descriptionWithDecimalRegex);
+
+        Matcher m = p.matcher(lineItem.getDescription());
+        if (m.find()) {
+            lineItem.setDescription(m.group("description").trim().replaceAll(" +", " "));
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean regexForDescWithNumbers(LineItem lineItem) {
+        String descriptionWithDecimalRegex = "(?<description>.+)\\s{2,}(?<amount>\\d+\\.\\d{2})";
+        Pattern p = Pattern.compile(descriptionWithDecimalRegex);
+
+        Matcher m = p.matcher(lineItem.getDescription());
+        if (m.find()) {
+            lineItem.setDescription(m.group("description").trim().replaceAll(" +", " "));
+            lineItem.setValue(m.group("amount"));
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean regexForDescWithNumbersWithOutDecimalDot(LineItem lineItem) {
+        String descriptionWithDecimalRegex = "(?<description>.+)\\s{2,}(?<amount>\\d+\\.\\d{2})";
+        Pattern p = Pattern.compile(descriptionWithDecimalRegex);
+
+        Matcher m = p.matcher(lineItem.getDescription());
+        if (m.find()) {
+            lineItem.setDescription(m.group("description").trim().replaceAll(" +", " "));
+            lineItem.setValue(m.group("amount"));
+        } else {
+            return false;
+        }
+        return true;
+    }
+
     public static Receipt getLineItemsForReceipt(Receipt receipt, String regex) {
 
         boolean firstLineItem = true;
@@ -19,8 +60,7 @@ public class StringHelper {
         Pattern p = Pattern.compile(regex);
 
         List<Integer> integerList = new ArrayList<>();
-        List<String> possibleLineItems = new ArrayList<>();
-
+        List<LineItem> possibleLineItems = new ArrayList<>();
 
         for (int i=0; i < inputStrings.length; i++) {
             String inputString = inputStrings[i];
@@ -34,7 +74,7 @@ public class StringHelper {
                 receipt.setLineItemEndLine(i);
 
                 // replaces extra spaces with one single space
-                String description  = m.group("description").trim().replaceAll(" +", " ");;
+                String description  = m.group("description").trim().replaceAll(" +", " ");
                 String currency     = m.group("currency");
                 String amountString = m.group("amount");
 
@@ -47,7 +87,11 @@ public class StringHelper {
                 lineItemList.add(lineItem);
             } else if (!firstLineItem) {
                 integerList.add(i);
-                possibleLineItems.add(inputString);
+
+                LineItem possibleLineItem = new LineItem();
+                possibleLineItem.setDescription(inputString);
+                possibleLineItem.setLineNumber(i);
+                possibleLineItems.add(possibleLineItem);
             }
         }
         receipt.setLineItems(lineItemList);

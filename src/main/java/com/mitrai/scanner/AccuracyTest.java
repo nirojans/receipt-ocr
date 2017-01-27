@@ -91,7 +91,7 @@ public class AccuracyTest implements Cloneable {
 
         int length = lineItem.getDescription().length();
         // TODO compute for 80% line items accuracy
-        int maxDifference = length -2;
+        int maxDifference = length /2;
 
         int accuracyLevel = entry.getValue();
         int manualDataLineNumber = entry.getKey();
@@ -99,7 +99,6 @@ public class AccuracyTest implements Cloneable {
         if (accuracyLevel <= maxDifference) {
 
             lineItem.setManualDataForLineItem(manualDataLineNumber, accuracyLevel, manualReceiptLineItemList.get(entry.getKey()));
-            // math abs have been used to eliminate the negative value scenarios
             int cal = (length - lineItem.getDescriptionAccuracyLevel());
             int accuracyPercentage = 0;
 
@@ -107,6 +106,7 @@ public class AccuracyTest implements Cloneable {
                 accuracyPercentage = cal * 100 / length;
             }
 
+            // TODO if below 30 also does not add
             lineItem.setDescriptionAccuracyPercentage(accuracyPercentage);
             lineItem.setManualDatalineNumber(manualDataLineNumber);
 
@@ -117,10 +117,40 @@ public class AccuracyTest implements Cloneable {
         }
     }
 
+    public static void calculatePriceAccuracyToDescIdentidiedLineItems(List<LineItem> identifiedLineItemList) {
+
+        for (LineItem identifiedItem : identifiedLineItemList) {
+            try {
+                if (identifiedItem.getValue() != null) {
+
+                    String value = identifiedItem.getValue();
+                    // This removes the trailing zeros from the value (Because the excel sheet does not have trailing zeros)
+                    value = value.indexOf(".") < 0 ? value : value.replaceAll("0*$", "").replaceAll("\\.$", "");
+                    identifiedItem.setValueAccuracyLevel(StringHelper.distance(value, identifiedItem.getManualDataValue()));
+
+                    int cal = (value.length() - identifiedItem.getValueAccuracyLevel());
+                    int valueAccuracyPercentage = 0;
+                    if (cal > 0) {
+                        valueAccuracyPercentage = cal * 100 / value.length();
+                    }
+
+                    identifiedItem.setValueAccuracyPercentage(valueAccuracyPercentage);
+                    identifiedItem.setValue(value);
+
+                } else {
+                    identifiedItem.setValueAccuracyLevel(5);
+                    identifiedItem.setValueAccuracyPercentage(0);
+                }
+            } catch (Exception e) {
+                System.out.printf("Exception Occurred while computing the accuracy of the line item values");
+            }
+        }
+    }
+
     public static OCRStats verifyLineItems(ScoreSummary scoreSummary, OCRStats ocrStats, Receipt receipt,
                                            List<ManualReceiptLineItem> manualLineItemsList, Result result) {
 
-        ArrayList<LineItem> ocrLineItemList = receipt.getPredictedLineItemFromManualData();
+        ArrayList<LineItem> ocrLineItemList = receipt.getFullTextPredictedLineItems();
         ArrayList<LineItem> identifiedLineItemList = new ArrayList<>();
         ArrayList<LineItem> unIdentifiedLineItemList = new ArrayList<>();
 
@@ -145,27 +175,28 @@ public class AccuracyTest implements Cloneable {
             }
         }
 
-        // check for the value accuracy
-        for (LineItem finalLineItem : identifiedLineItemList) {
+
+        // TODO convert possible line items through the manual data set
+        List<LineItem> possibleLineItemList = receipt.getPossibleLineItems();
+
+        for(int i=0; i< possibleLineItemList.size(); i++) {
             try {
-                String value = finalLineItem.getValue();
-                // This removes the trailing zeros from the value (Because the excel sheet does not have trailing zeros)
-                value = value.indexOf(".") < 0 ? value : value.replaceAll("0*$", "").replaceAll("\\.$", "");
-                finalLineItem.setValueAccuracyLevel(StringHelper.distance(value, finalLineItem.getManualDataValue()));
-
-                int cal = (value.length() - finalLineItem.getValueAccuracyLevel());
-                int valueAccuracyPercentage = 0;
-                if (cal > 0) {
-                    valueAccuracyPercentage = cal * 100 / value.length();
+                LineItem lineItem = possibleLineItemList.get(i);
+                if (manualLineItemsList.size() != 0) {
+                    LineItem item = identifyAndRemoveFromManualList(manualLineItemsList, lineItem);
+                    if (item != null) {
+                        identifiedLineItemList.add(item);
+                    } else {
+                        unIdentifiedLineItemList.add(lineItem);
+                    }
                 }
-
-                finalLineItem.setValueAccuracyPercentage(valueAccuracyPercentage);
-                finalLineItem.setValue(value);
-
             } catch (Exception e) {
-                System.out.printf("Exception Occurred while computing the accuracy of the line item values");
+                System.out.println("Array index out of bound exception when measuring the accuracy of the possible description" + e );
             }
         }
+
+        // check for the value accuracy
+        calculatePriceAccuracyToDescIdentidiedLineItems(identifiedLineItemList);
 
         // create a histogram for the results
         int[] descriptionHistogram = new int[identifiedLineItemList.size()];
@@ -183,7 +214,6 @@ public class AccuracyTest implements Cloneable {
         int[] histogramDesc = histogram(0, 100, 10, descriptionHistogram);
         int[] histogramValue = histogram(0, 100, 10, valueHistogram);
 
-        // TODO convert possible line items through the manual data set
 
         // add the missed items to the accuracy test
         histogramDesc[0] = histogramDesc[0] + manualLineItemsList.size();

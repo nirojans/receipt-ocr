@@ -15,8 +15,9 @@ public class Receipt implements Serializable {
     private int nameAccuracy;
 
     private ArrayList<LineItem> lineItems = new ArrayList<>();
-    private ArrayList<LineItem> predictedLineItemFromManualData = new ArrayList<>();
-    private List<String> possibleLineItems;
+    private ArrayList<LineItem> fullTextPredictedLineItems = new ArrayList<>();
+    // get possibele line item receipt line number
+    private List<LineItem> possibleLineItems;
 
     private String date;
     private String time;
@@ -124,20 +125,20 @@ public class Receipt implements Serializable {
         this.unclassifiedLineItemNumbers = unclassifiedLineItemNumbers;
     }
 
-    public List<String> getPossibleLineItems() {
+    public List<LineItem> getPossibleLineItems() {
         return possibleLineItems;
     }
 
-    public void setPossibleLineItems(List<String> possibleLineItems) {
+    public void setPossibleLineItems(List<LineItem> possibleLineItems) {
         this.possibleLineItems = possibleLineItems;
     }
 
-    public ArrayList<LineItem> getPredictedLineItemFromManualData() {
-        return predictedLineItemFromManualData;
+    public ArrayList<LineItem> getFullTextPredictedLineItems() {
+        return fullTextPredictedLineItems;
     }
 
-    public void setPredictedLineItemFromManualData(ArrayList<LineItem> predictedLineItemFromManualData) {
-        this.predictedLineItemFromManualData = predictedLineItemFromManualData;
+    public void setFullTextPredictedLineItems(ArrayList<LineItem> fullTextPredictedLineItems) {
+        this.fullTextPredictedLineItems = fullTextPredictedLineItems;
     }
 
 
