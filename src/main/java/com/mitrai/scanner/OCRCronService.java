@@ -26,9 +26,6 @@ public class OCRCronService {
             System.out.println("No files found to be processed");
         }
 
-
-        List<OCRStats> ocrStatsList = new ArrayList<>();
-
         for (int i = 0; i < listOfFiles.length; i++) {
             if (listOfFiles[i].isFile()) {
                 String fileNameWithExtension = listOfFiles[i].getName();
@@ -42,8 +39,7 @@ public class OCRCronService {
                     // read all text
                     receiptList = FileHelper.readAllResultsForAImage(fileNameWithoutExtension);
 
-                    Result result = new Result(DataServiceImpl.getNextSequence());
-                    result.setId(fileNameWithExtension);
+                    Result result = new Result(fileNameWithExtension);
 
                     if (receiptList.size() == 0) {
                         result.setStatus(Configs.CANNOT_PROCESS);
@@ -101,7 +97,7 @@ public class OCRCronService {
                             } else if (StringHelper.regexForDescAndLongSpace(item)) {
                                 doFullTextSearchForPossibleLineItems(item.getDescription(), highReceipt.getSuperMarketName());
                             }else{
-                                System.out.printf(item.getDescription());
+                                // TODO implement method to process this string
                             }
                         }
                     } catch (Exception e) {
@@ -139,7 +135,6 @@ public class OCRCronService {
                     result.setOcrStats(ocrStats);
 
                     DataServiceImpl.insertBatchProcessDetails(result);
-                    ocrStatsList.add(ocrStats);
                 }
             }
         }

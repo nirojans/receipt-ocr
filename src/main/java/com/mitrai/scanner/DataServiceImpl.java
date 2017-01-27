@@ -43,15 +43,11 @@ public class DataServiceImpl {
 
         mitraDB = properties.getProperty("mitraDB");
         configsCollection = properties.getProperty("configsCollection");
-
-
     }
-
 
     public static void insertIntoDB(MasterReceipt masterReceipt) throws UnknownHostException {
 
         MongoClient mongo = new MongoClient(localhost, port);
-
         DB db = mongo.getDB(ocrDB);
         DBCollection col = db.getCollection(ocrReceiptCollection);
 
@@ -69,24 +65,6 @@ public class DataServiceImpl {
         mongo.close();
     }
 
-    public static boolean isRecordExists(DBCollection col, String searchAttribute, String searchValue) {
-        DBCursor cursor = col.find(new BasicDBObject(searchAttribute, searchValue));
-
-        while(cursor.hasNext()) {
-            return true;
-        }
-        return false;
-    }
-
-    public static boolean isRecordExists(DBCollection col, String searchAttribute, int searchValue) {
-        DBCursor cursor = col.find(new BasicDBObject(searchAttribute, searchValue));
-
-        while(cursor.hasNext()) {
-            return true;
-        }
-        return false;
-    }
-
     public static List<ManualReceiptLineItem> doFullTextSearchFromManualData(String searchTerm, String collectionName) throws UnknownHostException {
         MongoClient mongo = new MongoClient(localhost, port);
         DB db = mongo.getDB(manualDataDB);
@@ -97,17 +75,13 @@ public class DataServiceImpl {
         DBObject sorting = new BasicDBObject("score", new BasicDBObject("$meta", "textScore"));
 
         DBCursor cursor = col.find(search, project).sort(sorting).limit(10);;
-
-
         List<ManualReceiptLineItem> manualReceiptLineItemList = new ArrayList<>();
 
         try {
-
             while(cursor.hasNext()) {
                 DBObject dbObject = cursor.next();
                 ManualReceiptLineItem manualReceiptLineItem = (new Gson()).fromJson(dbObject.toString(), ManualReceiptLineItem.class);
                 manualReceiptLineItemList.add(manualReceiptLineItem);
-
             }
         } finally {
             cursor.close();
@@ -141,38 +115,16 @@ public class DataServiceImpl {
         return manualReceiptLineItemList;
     }
 
-    public static List<MasterReceipt> getOCRMasterReceipt(String searchID, String collectionName) throws UnknownHostException {
 
-        MongoClient mongo = new MongoClient(localhost, 27017);
-        DB mongoOCRDB = mongo.getDB(ocrDB);
-        DBCollection col = mongoOCRDB.getCollection(ocrReceiptCollection);
-
-        DBCursor cursor = col.find(new BasicDBObject("id", searchID));
-        List<MasterReceipt> masterReceiptList = new ArrayList<>();
-
-        try {
-            while(cursor.hasNext()) {
-                DBObject dbObject = cursor.next();
-                MasterReceipt masterReceipt = (new Gson()).fromJson(dbObject.toString(), MasterReceipt.class);
-                masterReceiptList.add(masterReceipt);
-            }
-        } finally {
-            cursor.close();
-            mongo.close();
-        }
-        return masterReceiptList;
-    }
-
+    /*
+    Method saves the final results to the mongo DB
+     */
     public static void insertBatchProcessDetails(Result result) throws UnknownHostException {
 
         MongoClient mongo = new MongoClient(localhost, port);
 
         DB db = mongo.getDB(ocrDB);
         DBCollection col = db.getCollection("result");
-
-//         get the batch process id
-//        int batchProcessID = getNextSequence();
-//        result.setBatchProcessID(batchProcessID);
 
         //check if a document exists, If exists remove id=filename
         if (isRecordExists(col, "id", result.getId())) {
@@ -188,6 +140,27 @@ public class DataServiceImpl {
         mongo.close();
     }
 
+
+    public static boolean isRecordExists(DBCollection col, String searchAttribute, String searchValue) {
+        DBCursor cursor = col.find(new BasicDBObject(searchAttribute, searchValue));
+        while(cursor.hasNext()) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean isRecordExists(DBCollection col, String searchAttribute, int searchValue) {
+        DBCursor cursor = col.find(new BasicDBObject(searchAttribute, searchValue));
+        while(cursor.hasNext()) {
+            return true;
+        }
+        return false;
+    }
+
+
+    /*
+    This method is used to get the status variable to process the files randomly from the receipts folder
+     */
     public static boolean getRandomProcessStatus() throws UnknownHostException {
         MongoClient mongo = new MongoClient(localhost, 27017);
         DB configsDB = mongo.getDB(mitraDB);
@@ -215,7 +188,9 @@ public class DataServiceImpl {
         return false;
     }
 
-
+    /*
+        This method will be used as a counter implementation for mongo db
+     */
     public static int getNextSequence() throws UnknownHostException {
 
         MongoClient mongoClient = new MongoClient( localhost , 27017 );
@@ -232,4 +207,31 @@ public class DataServiceImpl {
         double d = Double.parseDouble(obj.get("seq").toString());
         return  (int) d;
     }
+
+
+    /*
+    TODO check if not it proper use remove
+     */
+    public static List<MasterReceipt> getOCRMasterReceipt(String searchID, String collectionName) throws UnknownHostException {
+
+        MongoClient mongo = new MongoClient(localhost, 27017);
+        DB mongoOCRDB = mongo.getDB(ocrDB);
+        DBCollection col = mongoOCRDB.getCollection(ocrReceiptCollection);
+
+        DBCursor cursor = col.find(new BasicDBObject("id", searchID));
+        List<MasterReceipt> masterReceiptList = new ArrayList<>();
+
+        try {
+            while(cursor.hasNext()) {
+                DBObject dbObject = cursor.next();
+                MasterReceipt masterReceipt = (new Gson()).fromJson(dbObject.toString(), MasterReceipt.class);
+                masterReceiptList.add(masterReceipt);
+            }
+        } finally {
+            cursor.close();
+            mongo.close();
+        }
+        return masterReceiptList;
+    }
+
 }

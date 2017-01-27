@@ -11,16 +11,6 @@ public class AppMain {
 
     public static void main(String[] args) throws Exception {
         System.out.printf("Starting the main application");
-
-//        // If the random batch processing status is true then copy files from tesco and sainsbury and put in the raw folder
-//        if (DataServiceImpl.getRandomProcessStatus()) {
-        if (true) {
-//            List<File> tescoFileList = FileHelper.selectRandomReceipts(FileHelper.tescoReceiptsFolderPath);
-//            List<File> sainsburyFileList = FileHelper.selectRandomReceipts(FileHelper.sainsburyReceiptsFolderPath);
-
-//            FileHelper.copySelectedReceiptsToRawImageFolder(tescoFileList);
-//            FileHelper.copySelectedReceiptsToRawImageFolder(sainsburyFileList);
-        }
         cronJob();
     }
 
@@ -33,7 +23,5 @@ public class AppMain {
         org.quartz.Scheduler scheduler2 = new StdSchedulerFactory().getScheduler();
         scheduler2.start();
         scheduler2.scheduleJob(job2, trigger2);
-
     }
-
 }

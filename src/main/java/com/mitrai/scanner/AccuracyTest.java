@@ -15,14 +15,10 @@ public class AccuracyTest implements Cloneable {
 
     public static ScoreSummary calculateLineItemScore(ScoreSummary scoreSummary, int[] descriptionAccuracyArray, int[] valueAccuracyArray, int totalLineItems){
 
-        // calculate line item accuracy
         List<LineScore> lineScoreList = new ArrayList<>();
         double totalScore = 0;
 
         for(int i=0;i< descriptionAccuracyArray.length; i++) {
-
-//            double descriptionScore = (descriptionAccuracyArray[i] * Configs.LINE_ITEMS_DESC_WEIGHT) / 100;
-//            double valueScore = (valueAccuracyArray[i] * Configs.LINE_ITEMS_VAL_WEIGHT) / 100;
 
             // ((description *  desc weight) + (value * val weight))/100
             double lineItemScore = ((descriptionAccuracyArray[i] * Configs.LINE_ITEMS_DESC_WEIGHT) + (valueAccuracyArray[i] * Configs.LINE_ITEMS_VAL_WEIGHT))/100;

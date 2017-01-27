@@ -13,23 +13,14 @@ public class Result implements Serializable {
 
     private String id;
     private String status = "DONE";
-    private OCRStats ocrStats;
     private ScoreSummary scoreSummary;
     private List<FinalLineItem> finalOCRLineItemList;
     private List<FinalLineItem> finalManualLineItemList;
-    private int batchProcessID;
+    private OCRStats ocrStats;
     private String[] rawData;
 
-    public Result(int batchProcessID) {
-        this.batchProcessID = batchProcessID;
-    }
-
-    public int getBatchProcessID() {
-        return batchProcessID;
-    }
-
-    public void setBatchProcessID(int batchProcessID) {
-        this.batchProcessID = batchProcessID;
+    public Result(String id) {
+        this.id = id;
     }
 
     public ScoreSummary getScoreSummary() {
