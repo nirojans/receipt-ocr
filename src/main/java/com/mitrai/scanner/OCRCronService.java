@@ -1,5 +1,7 @@
 package com.mitrai.scanner;
 
+import com.mitrai.scanner.score.ScoreSummary;
+
 import javax.xml.crypto.Data;
 import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
 import java.io.File;
@@ -112,9 +114,10 @@ public class OCRCronService {
 
 //                    List<String> manualArray = getLineManualItemsInStringArray(selectedManualReceiptList);
 
-                    ocrStats.setBrandAccuracy(AccuracyTest.verifySuperMarketBrand(masterReceipt.getSuperMarketName(), selectedManualReceiptList));
-                    // implement method to calculate line items accuracy for identified Line items
-                    AccuracyTest.verifyLineItems(ocrStats, highReceipt, selectedManualReceiptList);
+                    ScoreSummary scoreSummary = new ScoreSummary();
+                    AccuracyTest.verifySuperMarketBrand(scoreSummary, masterReceipt.getSuperMarketName(), selectedManualReceiptList);
+                    AccuracyTest.verifyLineItems(scoreSummary, ocrStats, highReceipt, selectedManualReceiptList);
+
                     ocrStatsList.add(ocrStats);
                 }
             }

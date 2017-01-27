@@ -1,6 +1,8 @@
 package com.mitrai.scanner;
 
-import java.net.InterfaceAddress;
+import com.mitrai.scanner.score.LineScore;
+import com.mitrai.scanner.score.ScoreSummary;
+
 import java.net.UnknownHostException;
 import java.util.*;
 
@@ -11,14 +13,45 @@ import static com.mitrai.scanner.TemplateEngine.ASC;
  */
 public class AccuracyTest implements Cloneable {
 
-    public static int verifySuperMarketBrand(String brandName, List<ManualReceipt> manualReceiptList) throws UnknownHostException {
+    public static int desPer = 95;
+    public static int valPer = 5;
+
+    public static ScoreSummary calculateLineItemScore(ScoreSummary scoreSummary, int[] des, int[] val, int totalLineItems){
+
+        // calculate line item accuracy
+        List<LineScore> lineScoreList = new ArrayList<>();
+        double totalScore = 0;
+
+        for(int i=0;i< des.length; i++) {
+
+            double descriptionScore = (des[i] * desPer) / 100;
+            double valueScore = (val[i] * valPer) / 100;
+
+            double score = ((des[i] * Configs.LINE_ITEMS_DESC_WEIGHT) + (val[i] * Configs.LINE_ITEMS_VAL_WEIGHT))/100;
+            double weightScore = score * Configs.LINE_ITEMS_WEIGHT/100;
+            totalScore += weightScore;
+            LineScore lineScorePoint = new LineScore();
+
+            lineScorePoint.setDesc(String.valueOf((int)descriptionScore));
+            lineScorePoint.setValue(String.valueOf((int)valueScore));
+
+            lineScorePoint.setTotalScore(String.valueOf((int)weightScore));
+            lineScoreList.add(lineScorePoint);
+        }
+
+        scoreSummary.setLineItemScore((int)(totalScore / totalLineItems));
+        scoreSummary.setLineLineScoreList(lineScoreList);
+        return scoreSummary;
+    }
+
+    public static ScoreSummary verifySuperMarketBrand(ScoreSummary scoreSummary, String brandName, List<ManualReceipt> manualReceiptList) throws UnknownHostException {
 
         String manualTescoShopName = manualReceiptList.get(0).getSHOP_NAME().toLowerCase();
-
         if (manualTescoShopName.contains(brandName)) {
-            return 100;
+            scoreSummary.setSuperMarketNameScore(Configs.MARKETNAME_SCORE_WEIGHT);
         }
-        return 0;
+        scoreSummary.setSuperMarketNameScore(0);
+        return scoreSummary;
     }
 
     public static LineItem identifyAndRemoveFromManualList(List<ManualReceipt> manualReceiptList, LineItem lineItem) {
@@ -51,6 +84,7 @@ public class AccuracyTest implements Cloneable {
             int accuracyPercentage = Math.abs(length - lineItem.getDescriptionAccuracyLevel()) * 100 / length;
             lineItem.setDescriptionAccuracyPercentage(accuracyPercentage);
 
+            lineItem.setManualDatalineNumber(manualDataLineNumber);
             manualReceiptList.remove(manualDataLineNumber);
         } else {
             return null;
@@ -59,7 +93,9 @@ public class AccuracyTest implements Cloneable {
         return lineItem;
     }
 
-    public static OCRStats verifyLineItems(OCRStats ocrStats, Receipt receipt, List<ManualReceipt> manualReceiptList) {
+    public static OCRStats verifyLineItems(ScoreSummary scoreSummary, OCRStats ocrStats, Receipt receipt,
+                                           List<ManualReceipt> manualLineItemsList) {
+
         ArrayList<LineItem> predictedLineItems = receipt.getPredictedLineItemFromManualData();
         ArrayList<LineItem> finalLineItems = new ArrayList<>();
 
@@ -69,14 +105,14 @@ public class AccuracyTest implements Cloneable {
             try {
                 LineItem lineItem = predictedLineItems.get(i);
                 // null returned when no match is found from the manual data set
-                if (manualReceiptList.size() != 0) {
-                    LineItem item = identifyAndRemoveFromManualList(manualReceiptList, lineItem);
+                if (manualLineItemsList.size() != 0) {
+                    LineItem item = identifyAndRemoveFromManualList(manualLineItemsList, lineItem);
                     if (item != null) {
                         finalLineItems.add(item);
                     }
                 }
             } catch (Exception e) {
-                System.out.println("Array index out of bound exception " + e);
+                System.out.println("Array index out of bound exception " + e );
             }
         }
 
@@ -104,14 +140,18 @@ public class AccuracyTest implements Cloneable {
             valueHistogram[i] = finalLineItems.get(i).getValueAccuracyPercentage();
         }
 
+        //
+        calculateLineItemScore(scoreSummary,descriptionHistogram, valueHistogram, manualLineItemsList.size());
+
         // This computes the histogram (min,max,bucketsize, valuesForHistogram)
         int[] histogramDesc = histogram(0, 100, 10, descriptionHistogram);
         int[] histogramValue = histogram(0, 100, 10, valueHistogram);
 
-        // TODO convert possible line items through the maual data set
+        // TODO convert possible line items through the manual data set
+
         // add the missed items to the accuracy test
-        histogramDesc[0] = histogramDesc[0] + manualReceiptList.size();
-        histogramValue[0] = histogramValue[0] + manualReceiptList.size();
+        histogramDesc[0] = histogramDesc[0] + manualLineItemsList.size();
+        histogramValue[0] = histogramValue[0] + manualLineItemsList.size();
 
         // remove the zero elements from the histogram
         HashMap<Integer, Integer> histogramAccuracyMap = new HashMap<>();
