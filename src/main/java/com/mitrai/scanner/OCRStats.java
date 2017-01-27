@@ -11,7 +11,9 @@ public class OCRStats implements Serializable{
 
     private String id;
     private String status;
-    private List<String[]> descriptionValueStats;
+    private String[] unclassifiedManualLineItem;
+    private String[] unclassifiedOCRLineItem;
+    private String[] descriptionValueStats;
     private Map<Integer, Integer> descriptionHistogram;
     private Map<Integer, Integer> valueHistogram;
     private int brandAccuracy;
@@ -28,11 +30,11 @@ public class OCRStats implements Serializable{
         this.id = id;
     }
 
-    public List<String[]> getDescriptionValueStats() {
+    public String[] getDescriptionValueStats() {
         return descriptionValueStats;
     }
 
-    public void setDescriptionValueStats(List<String[]> descriptionValueStats) {
+    public void setDescriptionValueStats(String[] descriptionValueStats) {
         this.descriptionValueStats = descriptionValueStats;
     }
 
@@ -66,5 +68,21 @@ public class OCRStats implements Serializable{
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String[] getUnclassifiedManualLineItem() {
+        return unclassifiedManualLineItem;
+    }
+
+    public void setUnclassifiedManualLineItem(String[] unclassifiedManualLineItem) {
+        this.unclassifiedManualLineItem = unclassifiedManualLineItem;
+    }
+
+    public String[] getUnclassifiedOCRLineItem() {
+        return unclassifiedOCRLineItem;
+    }
+
+    public void setUnclassifiedOCRLineItem(String[] unclassifiedOCRLineItem) {
+        this.unclassifiedOCRLineItem = unclassifiedOCRLineItem;
     }
 }

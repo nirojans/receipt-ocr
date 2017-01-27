@@ -75,6 +75,30 @@ public class Utils {
         return sortedMap;
     }
 
+    public static String[] setUnClassifiedManualData(List<ManualReceiptLineItem> manualReceiptLineItemList) {
+
+        String[] array = new String[manualReceiptLineItemList.size()];
+
+        for(int i=0; i < manualReceiptLineItemList.size(); i++) {
+            ManualReceiptLineItem item = manualReceiptLineItemList.get(i);
+            String items = item.getTILLROLL_LINE_DESC() + " | " + item.getLINE_PRICE() + " | " + item.getRecordID();
+            array[i] = items;
+        }
+        return array;
+    }
+
+    public static String[] setUnClassifiedOCRData(List<LineItem> unidentifiedItemList) {
+
+        String[] array = new String[unidentifiedItemList.size()];
+
+        for(int i=0; i < unidentifiedItemList.size(); i++) {
+            LineItem item = unidentifiedItemList.get(i);
+            array[i] = item.getDescription() + " | " + item.getValue() + " | " + item.getLineNumber();
+        }
+
+        return array;
+    }
+
     public static List<FinalLineItem> getOCRFinalLineItemListAfterAccuracyCheck(ArrayList<LineItem> ocrLineItemList) {
         List<FinalLineItem> finalLineItemList = new ArrayList<>();
 

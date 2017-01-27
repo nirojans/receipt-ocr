@@ -91,7 +91,7 @@ public class AccuracyTest implements Cloneable {
 
         int length = lineItem.getDescription().length();
         // TODO compute for 80% line items accuracy
-        int maxDifference = length / 2;
+        int maxDifference = length -2;
 
         int accuracyLevel = entry.getValue();
         int manualDataLineNumber = entry.getKey();
@@ -100,36 +100,44 @@ public class AccuracyTest implements Cloneable {
 
             lineItem.setManualDataForLineItem(manualDataLineNumber, accuracyLevel, manualReceiptLineItemList.get(entry.getKey()));
             // math abs have been used to eliminate the negative value scenarios
-            int accuracyPercentage = Math.abs(length - lineItem.getDescriptionAccuracyLevel()) * 100 / length;
-            lineItem.setDescriptionAccuracyPercentage(accuracyPercentage);
+            int cal = (length - lineItem.getDescriptionAccuracyLevel());
+            int accuracyPercentage = 0;
 
+            if (cal > 0) {
+                accuracyPercentage = cal * 100 / length;
+            }
+
+            lineItem.setDescriptionAccuracyPercentage(accuracyPercentage);
             lineItem.setManualDatalineNumber(manualDataLineNumber);
+
             manualReceiptLineItemList.remove(manualDataLineNumber);
+            return lineItem;
         } else {
             return null;
         }
-
-        return lineItem;
     }
 
     public static OCRStats verifyLineItems(ScoreSummary scoreSummary, OCRStats ocrStats, Receipt receipt,
                                            List<ManualReceiptLineItem> manualLineItemsList, Result result) {
 
-        ArrayList<LineItem> predictedLineItems = receipt.getPredictedLineItemFromManualData();
-        ArrayList<LineItem> finalOCRLineItemList = new ArrayList<>();
+        ArrayList<LineItem> ocrLineItemList = receipt.getPredictedLineItemFromManualData();
+        ArrayList<LineItem> identifiedLineItemList = new ArrayList<>();
+        ArrayList<LineItem> unIdentifiedLineItemList = new ArrayList<>();
 
         int totalManualLineItemSize = manualLineItemsList.size();
 
         // iterate through manual data
-        for(int i=0; i < predictedLineItems.size(); i++) {
+        for(int i=0; i < ocrLineItemList.size(); i++) {
             // key = manualData Line number , Distance
             try {
-                LineItem lineItem = predictedLineItems.get(i);
+                LineItem lineItem = ocrLineItemList.get(i);
                 // null returned when no match is found from the manual data set
                 if (manualLineItemsList.size() != 0) {
                     LineItem item = identifyAndRemoveFromManualList(manualLineItemsList, lineItem);
                     if (item != null) {
-                        finalOCRLineItemList.add(item);
+                        identifiedLineItemList.add(item);
+                    } else {
+                        unIdentifiedLineItemList.add(lineItem);
                     }
                 }
             } catch (Exception e) {
@@ -138,27 +146,34 @@ public class AccuracyTest implements Cloneable {
         }
 
         // check for the value accuracy
-        for (LineItem finalLineItem : finalOCRLineItemList) {
+        for (LineItem finalLineItem : identifiedLineItemList) {
             try {
                 String value = finalLineItem.getValue();
                 // This removes the trailing zeros from the value (Because the excel sheet does not have trailing zeros)
                 value = value.indexOf(".") < 0 ? value : value.replaceAll("0*$", "").replaceAll("\\.$", "");
                 finalLineItem.setValueAccuracyLevel(StringHelper.distance(value, finalLineItem.getManualDataValue()));
-                int valueAccuracyPercentage = Math.abs((value.length() - finalLineItem.getValueAccuracyLevel())) * 100 / value.length();
+
+                int cal = (value.length() - finalLineItem.getValueAccuracyLevel());
+                int valueAccuracyPercentage = 0;
+                if (cal > 0) {
+                    valueAccuracyPercentage = cal * 100 / value.length();
+                }
+
                 finalLineItem.setValueAccuracyPercentage(valueAccuracyPercentage);
                 finalLineItem.setValue(value);
+
             } catch (Exception e) {
                 System.out.printf("Exception Occurred while computing the accuracy of the line item values");
             }
         }
 
         // create a histogram for the results
-        int[] descriptionHistogram = new int[finalOCRLineItemList.size()];
-        int[] valueHistogram = new int[finalOCRLineItemList.size()];
+        int[] descriptionHistogram = new int[identifiedLineItemList.size()];
+        int[] valueHistogram = new int[identifiedLineItemList.size()];
 
-        for (int i = 0; i < finalOCRLineItemList.size(); i++) {
-            descriptionHistogram[i] = finalOCRLineItemList.get(i).getDescriptionAccuracyPercentage();
-            valueHistogram[i] = finalOCRLineItemList.get(i).getValueAccuracyPercentage();
+        for (int i = 0; i < identifiedLineItemList.size(); i++) {
+            descriptionHistogram[i] = identifiedLineItemList.get(i).getDescriptionAccuracyPercentage();
+            valueHistogram[i] = identifiedLineItemList.get(i).getValueAccuracyPercentage();
         }
 
         //
@@ -190,24 +205,26 @@ public class AccuracyTest implements Cloneable {
 
         ocrStats.setDescriptionHistogram(histogramAccuracyMap);
         ocrStats.setValueHistogram(valueAccuracyMap);
-        ocrStats.setDescriptionValueStats(finalResultsInStringArray(finalOCRLineItemList));
+        ocrStats.setDescriptionValueStats(finalResultsInStringArray(identifiedLineItemList));
+        ocrStats.setUnclassifiedManualLineItem(Utils.setUnClassifiedManualData(manualLineItemsList));
+        ocrStats.setUnclassifiedOCRLineItem(Utils.setUnClassifiedOCRData(unIdentifiedLineItemList));
 
-        result.setFinalOCRLineItemList(Utils.getOCRFinalLineItemListAfterAccuracyCheck(finalOCRLineItemList));
+        result.setFinalOCRLineItemList(Utils.getOCRFinalLineItemListAfterAccuracyCheck(identifiedLineItemList));
 
         return ocrStats;
     }
 
-    public static List<String[]> finalResultsInStringArray(List<LineItem> finalLineItems){
+    public static String[] finalResultsInStringArray(List<LineItem> finalLineItems){
 
-        List<String[]> stringList = new ArrayList<>();
-        for (LineItem item : finalLineItems) {
-            String desc = item.getDescription() + " | " + item.getManualDataDescription() + " | " +
-                    String.valueOf(item.getDescriptionAccuracyPercentage());
-            String value = item.getValue() + " | " + item.getManualDataValue() + " | " + String.valueOf(item.getValueAccuracyPercentage());
-            String[] array = {desc, value};
-            stringList.add(array);
+        String[] array = new String[finalLineItems.size()];
+        for (int i=0; i< finalLineItems.size(); i++) {
+            LineItem item = finalLineItems.get(i);
+            String desc = "Desc : " + item.getDescription() + " | " + item.getManualDataDescription() + " | " +
+                    String.valueOf(item.getDescriptionAccuracyPercentage()) + " |||| ";
+            String value = "Value : " + item.getValue() + " | " + item.getManualDataValue() + " | " + String.valueOf(item.getValueAccuracyPercentage());
+            array[i] = desc + value;
         }
-        return stringList;
+        return array;
     }
 
     public static int[] histogram(final int min, final int max, final int bucket, int[] array) {
