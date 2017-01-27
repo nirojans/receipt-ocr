@@ -25,11 +25,11 @@ public class LineItem implements Serializable {
 
     }
 
-    public void setManualDataForLineItem(int manualDatalineNumber, int descriptionAccuracyLevel,ManualReceipt manualReceipt) {
+    public void setManualDataForLineItem(int manualDatalineNumber, int descriptionAccuracyLevel,ManualReceiptLineItem manualReceiptLineItem) {
         this.manualDatalineNumber = manualDatalineNumber;
         this.descriptionAccuracyLevel = descriptionAccuracyLevel;
-        this.manualDataDescription = manualReceipt.getTILLROLL_LINE_DESC();
-        this.manualDataValue = manualReceipt.getLINE_PRICE();
+        this.manualDataDescription = manualReceiptLineItem.getTILLROLL_LINE_DESC();
+        this.manualDataValue = manualReceiptLineItem.getLINE_PRICE();
     }
 
     public LineItem(int descriptionAccuracyLevel, int lineNumber, int manualDatalineNumber, String description, String units, String value, String currencySymbol,

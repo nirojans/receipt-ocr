@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Created by niro273 on 1/21/17.
  */
-public class ManualReceipt implements Serializable {
+public class ManualReceiptLineItem implements Serializable {
 
     private int recordID;
     private String TILLROLL_DOC_ID;

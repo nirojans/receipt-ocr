@@ -140,6 +140,7 @@ public class FileHelper {
         return receiptList;
     }
 
+    //  FileHelper.writeResultsToFile(highReceipt, fileNameWithoutExtension + "_results.txt");
     public static void writeResultsToFile(Receipt receipt, String resultsFileName) {
         String FILENAME = FileHelper.resultsFolderPath + resultsFileName;
         String content = "Super Market Name : " + receipt.getSuperMarketName() + " \n";

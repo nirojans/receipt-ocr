@@ -87,7 +87,7 @@ public class DataServiceImpl {
         return false;
     }
 
-    public static List<ManualReceipt> doFullTextSearchFromManualData(String searchTerm, String collectionName) throws UnknownHostException {
+    public static List<ManualReceiptLineItem> doFullTextSearchFromManualData(String searchTerm, String collectionName) throws UnknownHostException {
         MongoClient mongo = new MongoClient(localhost, port);
         DB db = mongo.getDB(manualDataDB);
         DBCollection col = db.getCollection(collectionName);
@@ -99,46 +99,46 @@ public class DataServiceImpl {
         DBCursor cursor = col.find(search, project).sort(sorting).limit(10);;
 
 
-        List<ManualReceipt> manualReceiptList = new ArrayList<>();
+        List<ManualReceiptLineItem> manualReceiptLineItemList = new ArrayList<>();
 
         try {
 
             while(cursor.hasNext()) {
                 DBObject dbObject = cursor.next();
-                ManualReceipt manualReceipt = (new Gson()).fromJson(dbObject.toString(), ManualReceipt.class);
-                manualReceiptList.add(manualReceipt);
+                ManualReceiptLineItem manualReceiptLineItem = (new Gson()).fromJson(dbObject.toString(), ManualReceiptLineItem.class);
+                manualReceiptLineItemList.add(manualReceiptLineItem);
 
             }
         } finally {
             cursor.close();
             mongo.close();
         }
-        return manualReceiptList;
+        return manualReceiptLineItemList;
     }
 
-    public static List<ManualReceipt> getReceiptFromManualData(String searchID, String collectionName) throws UnknownHostException {
+    public static List<ManualReceiptLineItem> getReceiptFromManualData(String searchID, String collectionName) throws UnknownHostException {
 
         MongoClient mongo = new MongoClient(localhost, 27017);
         DB db = mongo.getDB(manualDataDB);
         DBCollection col = db.getCollection(collectionName);
 
         DBCursor cursor = col.find(new BasicDBObject("TILLROLL_DOC_ID", searchID));
-        List<ManualReceipt> manualReceiptList = new ArrayList<>();
+        List<ManualReceiptLineItem> manualReceiptLineItemList = new ArrayList<>();
 
         try {
             int i = 1;
             while(cursor.hasNext()) {
                 DBObject dbObject = cursor.next();
-                ManualReceipt manualReceipt = (new Gson()).fromJson(dbObject.toString(), ManualReceipt.class);
+                ManualReceiptLineItem manualReceiptLineItem = (new Gson()).fromJson(dbObject.toString(), ManualReceiptLineItem.class);
                 i = i + 1;
-                manualReceipt.setRecordID(i);
-                manualReceiptList.add(manualReceipt);
+                manualReceiptLineItem.setRecordID(i);
+                manualReceiptLineItemList.add(manualReceiptLineItem);
             }
         } finally {
             cursor.close();
             mongo.close();
         }
-        return manualReceiptList;
+        return manualReceiptLineItemList;
     }
 
     public static List<MasterReceipt> getOCRMasterReceipt(String searchID, String collectionName) throws UnknownHostException {
@@ -174,10 +174,10 @@ public class DataServiceImpl {
 //        int batchProcessID = getNextSequence();
 //        result.setBatchProcessID(batchProcessID);
 
-        //check if a document exists, If exists remove
-        if (isRecordExists(col, "id", result.getBatchProcessID())) {
+        //check if a document exists, If exists remove id=filename
+        if (isRecordExists(col, "id", result.getId())) {
             BasicDBObject document = new BasicDBObject();
-            document.put("id", result.getBatchProcessID());
+            document.put("id", result.getId());
             col.remove(document);
         }
 
