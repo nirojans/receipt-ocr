@@ -1,7 +1,6 @@
 package com.mitrai.scanner;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -11,11 +10,11 @@ public class OCRStats implements Serializable{
 
     private String id;
     private String status;
+    private String[] identifiedDescriptionAndValue;
     private String[] unclassifiedManualLineItem;
     private String[] unclassifiedOCRLineItem;
-    private String[] descriptionValueStats;
-    private Map<Integer, Integer> descriptionHistogram;
-    private Map<Integer, Integer> valueHistogram;
+    private Map<Integer, Integer> descriptionAccuracyHistogram;
+    private Map<Integer, Integer> valueAccuracyHistogram;
     private int brandAccuracy;
 
     public OCRStats(String id) {
@@ -30,28 +29,28 @@ public class OCRStats implements Serializable{
         this.id = id;
     }
 
-    public String[] getDescriptionValueStats() {
-        return descriptionValueStats;
+    public String[] getIdentifiedDescriptionAndValue() {
+        return identifiedDescriptionAndValue;
     }
 
-    public void setDescriptionValueStats(String[] descriptionValueStats) {
-        this.descriptionValueStats = descriptionValueStats;
+    public void setIdentifiedDescriptionAndValue(String[] identifiedDescriptionAndValue) {
+        this.identifiedDescriptionAndValue = identifiedDescriptionAndValue;
     }
 
-    public Map<Integer, Integer> getDescriptionHistogram() {
-        return descriptionHistogram;
+    public Map<Integer, Integer> getDescriptionAccuracyHistogram() {
+        return descriptionAccuracyHistogram;
     }
 
-    public void setDescriptionHistogram(Map<Integer, Integer> descriptionHistogram) {
-        this.descriptionHistogram = descriptionHistogram;
+    public void setDescriptionAccuracyHistogram(Map<Integer, Integer> descriptionAccuracyHistogram) {
+        this.descriptionAccuracyHistogram = descriptionAccuracyHistogram;
     }
 
-    public Map<Integer, Integer> getValueHistogram() {
-        return valueHistogram;
+    public Map<Integer, Integer> getValueAccuracyHistogram() {
+        return valueAccuracyHistogram;
     }
 
-    public void setValueHistogram(Map<Integer, Integer> valueHistogram) {
-        this.valueHistogram = valueHistogram;
+    public void setValueAccuracyHistogram(Map<Integer, Integer> valueAccuracyHistogram) {
+        this.valueAccuracyHistogram = valueAccuracyHistogram;
     }
 
     public int getBrandAccuracy() {

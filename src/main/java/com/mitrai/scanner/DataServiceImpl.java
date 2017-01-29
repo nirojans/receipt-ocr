@@ -65,6 +65,34 @@ public class DataServiceImpl {
         mongo.close();
     }
 
+    public static void insertRawDataIntoDB(Receipt receipt) throws UnknownHostException {
+        MongoClient mongo = new MongoClient(localhost, port);
+        DB db = mongo.getDB(ocrDB);
+        DBCollection col = db.getCollection("rawData");
+
+        String[] rawData = receipt.getRawData();
+        BasicDBObject document = new BasicDBObject();
+        // Delete All documents from collection Using blank BasicDBObject
+        col.remove(document);
+
+        // Delete All documents from collection using DBCursor
+        DBCursor cursor = col.find();
+        while (cursor.hasNext()) {
+            col.remove(cursor.next());
+        }
+
+        for (int i=0;i<rawData.length;i++) {
+            String desc = rawData[i];
+            BasicDBObject itemDocument = new BasicDBObject();
+            itemDocument.put("id", receipt.getId());
+            itemDocument.put("description", desc);
+            itemDocument.put("lineNumber", i);
+            col.insert(itemDocument);
+        }
+        mongo.close();
+
+    }
+
     public static void insertLineItemsIntoDB(Receipt receipt) throws UnknownHostException {
 
         MongoClient mongo = new MongoClient(localhost, port);
@@ -92,11 +120,11 @@ public class DataServiceImpl {
         mongo.close();
     }
 
-    public static LineItem doFullTextSearchForLineItem(String searchTerm) throws UnknownHostException {
+    public static LineItem doFullTextSearchForLineItem(String searchTerm, String collectionName) throws UnknownHostException {
 
         MongoClient mongo = new MongoClient(localhost, port);
         DB db = mongo.getDB(ocrDB);
-        DBCollection col = db.getCollection("lineItems");
+        DBCollection col = db.getCollection(collectionName);
 
         DBObject search = new BasicDBObject("$text", new BasicDBObject("$search", searchTerm));
         DBObject project = new BasicDBObject("score", new BasicDBObject("$meta", "textScore"));

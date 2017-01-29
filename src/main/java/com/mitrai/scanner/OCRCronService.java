@@ -1,7 +1,6 @@
 package com.mitrai.scanner;
 
 import com.mitrai.scanner.receipt.FinalLineItem;
-import com.mitrai.scanner.score.LineScore;
 import com.mitrai.scanner.score.ScoreSummary;
 
 import java.io.File;
@@ -36,8 +35,10 @@ public class OCRCronService {
                 String fileNameWithoutExtension = FileHelper.getFileNameWithoutExtension(listOfFiles[i]);
                 // check if it is a valid input
                 String extensionName = FileHelper.getFileExtension(listOfFiles[i]);
-                if (extensionName.equalsIgnoreCase("jpeg") || extensionName.equalsIgnoreCase("jpg") || extensionName.equalsIgnoreCase("png")) {
+                if (extensionName.equalsIgnoreCase("jpeg") || extensionName.equalsIgnoreCase("jpg") || extensionName.equalsIgnoreCase("png")
+                        || extensionName.equalsIgnoreCase("tif") || extensionName.equalsIgnoreCase("tiff")) {
 
+                    System.out.printf("started processing file : " + fileNameWithExtension);
                     List<Receipt> receiptList = performOCRBasedOnProdOrDev(fileNameWithExtension, fileNameWithoutExtension);
                     OCRStats ocrStats = new OCRStats(fileNameWithoutExtension);
                     // read all text
@@ -72,9 +73,13 @@ public class OCRCronService {
                     result.setRawData(highReceipt.getRawData());
 
                     masterReceipt.setLineItemList(highReceipt.getLineItems());
-//                    DataServiceImpl.insertIntoDB(masterReceipt);
+
+                    DataServiceImpl.insertIntoDB(masterReceipt);
                     DataServiceImpl.insertLineItemsIntoDB(highReceipt);
-                    doFullTextSearchForReceiptTotal(highReceipt);
+                    DataServiceImpl.insertRawDataIntoDB(highReceipt);
+
+                    doFullTextSearchForReceiptTotal(result);
+                    removeUnwantedOccurrencesFromReceipt(highReceipt);
 
                     List<ManualReceiptLineItem> selectedManualReceiptLineItemList = new ArrayList<>();
 
@@ -101,7 +106,7 @@ public class OCRCronService {
                     // process line item with description value and with out currency symbol
                     try {
                         for (LineItem item : highReceipt.getPossibleLineItems()) {
-                            if (StringHelper.regexForDescWithNumbers(item)) {
+                            if (StringHelper.regexForDescWithNumbersAndPeriod(item)) {
                                 doFullTextSearchForPossibleLineItems(item.getDescription(), highReceipt.getSuperMarketName());
                             } else if (StringHelper.regexForDescAndLongSpace(item)) {
                                 doFullTextSearchForPossibleLineItems(item.getDescription(), highReceipt.getSuperMarketName());
@@ -131,8 +136,7 @@ public class OCRCronService {
                         selectedManualReceiptLineItemList = manualSainsReceiptList;
                     }
 
-                    result.setFinalManualLineItemList(Utils.getManualFinalLineItemList(selectedManualReceiptLineItemList));
-
+                    result.setManualLineItemList(Utils.getManualFinalLineItemList(selectedManualReceiptLineItemList));
                     ScoreSummary scoreSummary = new ScoreSummary();
 
                     AccuracyTest.verifySuperMarketBrand(scoreSummary, masterReceipt.getSuperMarketName(), selectedManualReceiptLineItemList);
@@ -142,24 +146,22 @@ public class OCRCronService {
 
                     result.setScoreSummary(scoreSummary);
                     result.setOcrStats(ocrStats);
-
-                    reorderResutBasedOnLineItemNumber(result);
+                    result.setFinalScore(scoreSummary.getTotalScore());
                     DataServiceImpl.insertBatchProcessDetails(result);
+                    // TODO remove temporary data from DB
                 }
             }
         }
         System.out.println("Ending the batch processing " + new Date());
     }
 
-    public static void doFullTextSearchForReceiptTotal(Receipt receipt) throws UnknownHostException {
-
+    public static void removeUnwantedOccurrencesFromReceipt(Receipt receipt) throws UnknownHostException {
         String[] totalArray = {"Total" , "sub total"};
-
         List<LineItem> lineItemsWithTotal = new ArrayList<>();
-
+        // Data cleaning to remove total string occurrences
         for(int i=0;i < totalArray.length;i ++) {
-            LineItem fullTextItem = DataServiceImpl.doFullTextSearchForLineItem(totalArray[i]);
-            if (fullTextItem != null) {
+            LineItem fullTextItem = DataServiceImpl.doFullTextSearchForLineItem(totalArray[i], "lineItems");
+            if (fullTextItem != null && 1.4 <= fullTextItem.getScore()) {
                 // check if already exists
                 boolean isExists = false;
                 for (LineItem item : lineItemsWithTotal) {
@@ -179,17 +181,26 @@ public class OCRCronService {
         for (LineItem item : lineItemsWithTotal) {
             removeLineItemFromList(lineItemList, item.getLineNumber());
         }
+    }
+
+    public static void doFullTextSearchForReceiptTotal(Result result) throws UnknownHostException {
 
         // get the total of the receipt
         // If the super market name is tesco
-        LineItem totalLineItems = DataServiceImpl.doFullTextSearchForLineItem("TOTAL TO PAY");
-        boolean totalValueFound = StringHelper.regexForDescWithNumbers(totalLineItems);
-        if (!totalValueFound) {
-            // TOTAL with currency symbol
+        LineItem totalLineItem = DataServiceImpl.doFullTextSearchForLineItem("TOTAL TO PAY", "rawData");
+        // score 1.2
+        // TODO refactor this method
+        if (totalLineItem != null && (1.2 < totalLineItem.getScore())) {
+            boolean totalValueFound = StringHelper.regexForDescWithNumbersAndPeriod(totalLineItem);
+            if (!totalValueFound) {
+                if (StringHelper.regexForDescWithNumbersOnly(totalLineItem)) {
+                    result.setReceiptTotal(totalLineItem.getValue());
+                }
+                // TOTAL with currency symbol
+            } else {
+                result.setReceiptTotal(totalLineItem.getValue());
+            }
         }
-
-        // If sains bury then total string
-
     }
 
     public static void removeLineItemFromList(List<LineItem> lineItemList, int lineNumber) {
@@ -200,16 +211,15 @@ public class OCRCronService {
         }
     }
 
-
     public static void reorderResutBasedOnLineItemNumber(Result result) {
 
-        List<FinalLineItem> finalLineItemList = result.getFinalOCRLineItemList();
+        List<FinalLineItem> finalLineItemList = result.getOCRLineItemList();
         Collections.sort(finalLineItemList, new Comparator<FinalLineItem>(){
             public int compare(FinalLineItem f1, FinalLineItem f2) {
                 return f1.getLineNumber() - f2.getLineNumber();
             }
         });
-        result.setFinalOCRLineItemList(finalLineItemList);
+        result.setOCRLineItemList(finalLineItemList);
     }
 
 

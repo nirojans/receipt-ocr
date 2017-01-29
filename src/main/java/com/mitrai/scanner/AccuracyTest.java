@@ -198,6 +198,13 @@ public class AccuracyTest implements Cloneable {
         int[] descriptionHistogram = new int[identifiedLineItemList.size()];
         int[] valueHistogram = new int[identifiedLineItemList.size()];
 
+        // Re ordering the result set to easily map identified line items with manual line items
+        Collections.sort(identifiedLineItemList, new Comparator<LineItem>(){
+            public int compare(LineItem l1, LineItem l2) {
+                return l1.getLineNumber() - l2.getLineNumber();
+            }
+        });
+
         for (int i = 0; i < identifiedLineItemList.size(); i++) {
             descriptionHistogram[i] = identifiedLineItemList.get(i).getDescriptionAccuracyPercentage();
             valueHistogram[i] = identifiedLineItemList.get(i).getValueAccuracyPercentage();
@@ -229,13 +236,13 @@ public class AccuracyTest implements Cloneable {
             }
         }
 
-        ocrStats.setDescriptionHistogram(histogramAccuracyMap);
-        ocrStats.setValueHistogram(valueAccuracyMap);
-        ocrStats.setDescriptionValueStats(finalResultsInStringArray(identifiedLineItemList));
+        ocrStats.setDescriptionAccuracyHistogram(histogramAccuracyMap);
+        ocrStats.setValueAccuracyHistogram(valueAccuracyMap);
+        ocrStats.setIdentifiedDescriptionAndValue(finalResultsInStringArray(identifiedLineItemList));
         ocrStats.setUnclassifiedManualLineItem(Utils.setUnClassifiedManualData(manualLineItemsList));
         ocrStats.setUnclassifiedOCRLineItem(Utils.setUnClassifiedOCRData(unIdentifiedLineItemList));
 
-        result.setFinalOCRLineItemList(Utils.getOCRFinalLineItemListAfterAccuracyCheck(identifiedLineItemList));
+        result.setOCRLineItemList(Utils.getOCRFinalLineItemListAfterAccuracyCheck(identifiedLineItemList));
 
         return ocrStats;
     }

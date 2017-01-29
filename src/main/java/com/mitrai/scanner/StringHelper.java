@@ -23,7 +23,21 @@ public class StringHelper {
         return true;
     }
 
-    public static boolean regexForDescWithNumbers(LineItem lineItem) {
+    public static boolean regexForDescWithNumbersOnly(LineItem lineItem) {
+        String descriptionWithDecimalRegex = "(?<description>.+)\\s{2,}(?<amount>\\d+)";
+        Pattern p = Pattern.compile(descriptionWithDecimalRegex);
+
+        Matcher m = p.matcher(lineItem.getDescription());
+        if (m.find()) {
+            lineItem.setDescription(m.group("description").trim().replaceAll(" +", " "));
+            lineItem.setValue(m.group("amount"));
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean regexForDescWithNumbersAndPeriod(LineItem lineItem) {
         String descriptionWithDecimalRegex = "(?<description>.+)\\s{2,}(?<amount>\\d+\\.\\d{2})";
         Pattern p = Pattern.compile(descriptionWithDecimalRegex);
 

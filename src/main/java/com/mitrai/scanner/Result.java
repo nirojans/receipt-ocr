@@ -13,11 +13,12 @@ public class Result implements Serializable {
 
     private String id;
     private String status = "DONE";
+    private int finalScore;
     private ScoreSummary scoreSummary;
     private String superMarketName;
     private String receiptTotal = "0";
-    private List<FinalLineItem> finalOCRLineItemList;
-    private List<FinalLineItem> finalManualLineItemList;
+    private List<FinalLineItem> OCRLineItemList;
+    private List<FinalLineItem> ManualLineItemList;
     private OCRStats ocrStats;
     private String[] rawData;
 
@@ -57,20 +58,20 @@ public class Result implements Serializable {
         this.status = status;
     }
 
-    public List<FinalLineItem> getFinalOCRLineItemList() {
-        return finalOCRLineItemList;
+    public List<FinalLineItem> getOCRLineItemList() {
+        return OCRLineItemList;
     }
 
-    public void setFinalOCRLineItemList(List<FinalLineItem> finalOCRLineItemList) {
-        this.finalOCRLineItemList = finalOCRLineItemList;
+    public void setOCRLineItemList(List<FinalLineItem> OCRLineItemList) {
+        this.OCRLineItemList = OCRLineItemList;
     }
 
-    public List<FinalLineItem> getFinalManualLineItemList() {
-        return finalManualLineItemList;
+    public List<FinalLineItem> getManualLineItemList() {
+        return ManualLineItemList;
     }
 
-    public void setFinalManualLineItemList(List<FinalLineItem> finalManualLineItemList) {
-        this.finalManualLineItemList = finalManualLineItemList;
+    public void setManualLineItemList(List<FinalLineItem> manualLineItemList) {
+        this.ManualLineItemList = manualLineItemList;
     }
 
     public String[] getRawData() {
@@ -95,5 +96,13 @@ public class Result implements Serializable {
 
     public void setReceiptTotal(String receiptTotal) {
         this.receiptTotal = receiptTotal;
+    }
+
+    public int getFinalScore() {
+        return finalScore;
+    }
+
+    public void setFinalScore(int finalScore) {
+        this.finalScore = finalScore;
     }
 }
