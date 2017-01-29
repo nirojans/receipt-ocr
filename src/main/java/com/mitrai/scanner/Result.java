@@ -14,6 +14,8 @@ public class Result implements Serializable {
     private String id;
     private String status = "DONE";
     private ScoreSummary scoreSummary;
+    private String superMarketName;
+    private String receiptTotal = "0";
     private List<FinalLineItem> finalOCRLineItemList;
     private List<FinalLineItem> finalManualLineItemList;
     private OCRStats ocrStats;
@@ -78,5 +80,20 @@ public class Result implements Serializable {
     public void setRawData(String[] rawData) {
         this.rawData = rawData;
     }
-}
 
+    public String getSuperMarketName() {
+        return superMarketName;
+    }
+
+    public void setSuperMarketName(String superMarketName) {
+        this.superMarketName = superMarketName;
+    }
+
+    public String getReceiptTotal() {
+        return receiptTotal;
+    }
+
+    public void setReceiptTotal(String receiptTotal) {
+        this.receiptTotal = receiptTotal;
+    }
+}

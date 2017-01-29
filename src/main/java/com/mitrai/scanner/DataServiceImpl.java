@@ -65,6 +65,57 @@ public class DataServiceImpl {
         mongo.close();
     }
 
+    public static void insertLineItemsIntoDB(Receipt receipt) throws UnknownHostException {
+
+        MongoClient mongo = new MongoClient(localhost, port);
+        DB db = mongo.getDB(ocrDB);
+        DBCollection col = db.getCollection("lineItems");
+
+        List<LineItem> lineItemList = receipt.getLineItems();
+        BasicDBObject document = new BasicDBObject();
+        // Delete All documents from collection Using blank BasicDBObject
+        col.remove(document);
+
+        // Delete All documents from collection using DBCursor
+        DBCursor cursor = col.find();
+        while (cursor.hasNext()) {
+            col.remove(cursor.next());
+        }
+
+        for (LineItem item : lineItemList) {
+            BasicDBObject itemDocument = new BasicDBObject();
+            itemDocument.put("id", receipt.getId());
+            itemDocument.put("description", item.getDescription());
+            itemDocument.put("lineNumber", item.getLineNumber());
+            col.insert(itemDocument);
+        }
+        mongo.close();
+    }
+
+    public static LineItem doFullTextSearchForLineItem(String searchTerm) throws UnknownHostException {
+
+        MongoClient mongo = new MongoClient(localhost, port);
+        DB db = mongo.getDB(ocrDB);
+        DBCollection col = db.getCollection("lineItems");
+
+        DBObject search = new BasicDBObject("$text", new BasicDBObject("$search", searchTerm));
+        DBObject project = new BasicDBObject("score", new BasicDBObject("$meta", "textScore"));
+        DBObject sorting = new BasicDBObject("score", new BasicDBObject("$meta", "textScore"));
+
+        DBCursor cursor = col.find(search, project).sort(sorting).limit(2);;
+
+        try {
+            while(cursor.hasNext()) {
+                DBObject dbObject = cursor.next();
+                return  (new Gson()).fromJson(dbObject.toString(), LineItem.class);
+            }
+        } finally {
+            cursor.close();
+            mongo.close();
+        }
+        return null;
+    }
+
     public static List<ManualReceiptLineItem> doFullTextSearchFromManualData(String searchTerm, String collectionName) throws UnknownHostException {
         MongoClient mongo = new MongoClient(localhost, port);
         DB db = mongo.getDB(manualDataDB);

@@ -1,11 +1,15 @@
 package com.mitrai.scanner;
 
+import com.mitrai.scanner.receipt.FinalLineItem;
+import com.mitrai.scanner.score.LineScore;
 import com.mitrai.scanner.score.ScoreSummary;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -51,6 +55,8 @@ public class OCRCronService {
                     masterReceipt = TemplateEngine.identifySuperMarketName(receiptList, masterReceipt);
 
                     String superMarketBrand = masterReceipt.getSuperMarketName();
+                    result.setSuperMarketName(superMarketBrand);
+
                     TemplateEngine.identifyLineItems(receiptList);
 
                     masterReceipt.setReceiptList(receiptList);
@@ -66,7 +72,10 @@ public class OCRCronService {
                     result.setRawData(highReceipt.getRawData());
 
                     masterReceipt.setLineItemList(highReceipt.getLineItems());
-                    DataServiceImpl.insertIntoDB(masterReceipt);
+//                    DataServiceImpl.insertIntoDB(masterReceipt);
+                    DataServiceImpl.insertLineItemsIntoDB(highReceipt);
+                    doFullTextSearchForReceiptTotal(highReceipt);
+
                     List<ManualReceiptLineItem> selectedManualReceiptLineItemList = new ArrayList<>();
 
                     // Do the full text search for the Line Items identified with highest accuracy
@@ -134,12 +143,75 @@ public class OCRCronService {
                     result.setScoreSummary(scoreSummary);
                     result.setOcrStats(ocrStats);
 
+                    reorderResutBasedOnLineItemNumber(result);
                     DataServiceImpl.insertBatchProcessDetails(result);
                 }
             }
         }
         System.out.println("Ending the batch processing " + new Date());
     }
+
+    public static void doFullTextSearchForReceiptTotal(Receipt receipt) throws UnknownHostException {
+
+        String[] totalArray = {"Total" , "sub total"};
+
+        List<LineItem> lineItemsWithTotal = new ArrayList<>();
+
+        for(int i=0;i < totalArray.length;i ++) {
+            LineItem fullTextItem = DataServiceImpl.doFullTextSearchForLineItem(totalArray[i]);
+            if (fullTextItem != null) {
+                // check if already exists
+                boolean isExists = false;
+                for (LineItem item : lineItemsWithTotal) {
+                    if (fullTextItem.getLineNumber() == item.getLineNumber()) {
+                        isExists = true;
+                    }
+                }
+                if (!isExists) {
+                    lineItemsWithTotal.add(fullTextItem);
+                }
+            }
+        }
+
+        // remove the identified total occurrence from line item list
+        List<LineItem> lineItemList = receipt.getLineItems();
+
+        for (LineItem item : lineItemsWithTotal) {
+            removeLineItemFromList(lineItemList, item.getLineNumber());
+        }
+
+        // get the total of the receipt
+        // If the super market name is tesco
+        LineItem totalLineItems = DataServiceImpl.doFullTextSearchForLineItem("TOTAL TO PAY");
+        boolean totalValueFound = StringHelper.regexForDescWithNumbers(totalLineItems);
+        if (!totalValueFound) {
+            // TOTAL with currency symbol
+        }
+
+        // If sains bury then total string
+
+    }
+
+    public static void removeLineItemFromList(List<LineItem> lineItemList, int lineNumber) {
+        for(int i=0; i < lineItemList.size(); i++) {
+            if (lineItemList.get(i).getLineNumber() == lineNumber) {
+                lineItemList.remove(i);
+            }
+        }
+    }
+
+
+    public static void reorderResutBasedOnLineItemNumber(Result result) {
+
+        List<FinalLineItem> finalLineItemList = result.getFinalOCRLineItemList();
+        Collections.sort(finalLineItemList, new Comparator<FinalLineItem>(){
+            public int compare(FinalLineItem f1, FinalLineItem f2) {
+                return f1.getLineNumber() - f2.getLineNumber();
+            }
+        });
+        result.setFinalOCRLineItemList(finalLineItemList);
+    }
+
 
     public static String doFullTextSearchForPossibleLineItems(String lineItem, String superMarketBrand) throws UnknownHostException {
         return doFullTextSearchForLineItems(lineItem, superMarketBrand);

@@ -117,35 +117,6 @@ public class StringHelper {
 
     }
 
-
-    public static void testMethodForRegexLineItems(String[] array) {
-        String poundSymbol = "£";
-        String[] inputStrings = {
-                "CHOC. ORANGE    x         " + poundSymbol + "1.00"
-                , "CHOC.    ORANGE    x         L1.00",
-                "NUMBER   I W'xwxmwxxx‘xxx7089  ICC",
-                "CHOC. Niro    x         $1.00",
-                "CHOC.    ORANGE    x         L1.0"
-        };
-
-        String regex = "(?<description>.+)"
-                + "\\s{2,}"                             // two or more white space
-                + "(?<currency>"+poundSymbol+"|\\w)"    // Pound symbol may be mis-reaad
-                + "(?<amount>\\d+\\.\\d{2})";
-        Pattern p = Pattern.compile(regex);
-        for (String inputString : inputStrings) {
-            Matcher m = p.matcher(inputString);
-            if (m.find()) {
-                String description  = m.group("description");
-                String currency     = m.group("currency");
-                String amountString = m.group("amount");
-
-                System.out.format("Description: %s%n" + "Currency: %s%n" + "Amount: %s%n", description.trim() , currency
-                        , amountString);
-            }
-        }
-    }
-
     /*  This method is for String similarity computations (levenshtein distance)
         If the words are same will give zero
      */

@@ -21,6 +21,9 @@ public class LineItem implements Serializable {
     private String manualDataDescription;
     private String manualDataValue;
 
+    // full text score
+    private double score;
+
     public LineItem() {
 
     }
@@ -140,5 +143,13 @@ public class LineItem implements Serializable {
 
     public void setValueAccuracyPercentage(int valueAccuracyPercentage) {
         this.valueAccuracyPercentage = valueAccuracyPercentage;
+    }
+
+    public double getScore() {
+        return score;
+    }
+
+    public void setScore(double score) {
+        this.score = score;
     }
 }
