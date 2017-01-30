@@ -44,7 +44,6 @@ public class AccuracyTest implements Cloneable {
         int totalScore = 0;
 
         totalScore += scoreSummary.getSuperMarketNameScore();
-        totalScore += scoreSummary.getReceiptTotalScore();
         totalScore += scoreSummary.getLineItemScore();
         totalScore += scoreSummary.getReceiptTotalScore();
 
