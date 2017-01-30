@@ -46,14 +46,31 @@ public class AccuracyTest implements Cloneable {
         totalScore += scoreSummary.getSuperMarketNameScore();
         totalScore += scoreSummary.getReceiptTotalScore();
         totalScore += scoreSummary.getLineItemScore();
+        totalScore += scoreSummary.getReceiptTotalScore();
 
         scoreSummary.setTotalScore(totalScore);
         return scoreSummary;
     }
 
-    public static ScoreSummary verifyReceiptTotalScore(ScoreSummary scoreSummary) {
+    public static ScoreSummary verifyReceiptTotalScore(Result result, ScoreSummary scoreSummary, String manualTotal) {
 
-        scoreSummary.setReceiptTotalScore(0);
+        if (manualTotal != null) {
+            String value = result.getReceiptTotal();
+            // This removes the trailing zeros from the value (Because the excel sheet does not have trailing zeros)
+            value = value.indexOf(".") < 0 ? value : value.replaceAll("0*$", "").replaceAll("\\.$", "");
+            int distance = StringHelper.distance(value, manualTotal);
+
+            int cal = (value.length() - distance);
+            int valueAccuracyPercentage = 0;
+            if (cal > 0) {
+                valueAccuracyPercentage = cal * 100 / value.length();
+            }
+
+            scoreSummary.setReceiptTotalScore(valueAccuracyPercentage * Configs.TOTAL_WEIGHT / 100);
+        } else {
+            scoreSummary.setReceiptTotalScore(0);
+        }
+
         return scoreSummary;
     }
 

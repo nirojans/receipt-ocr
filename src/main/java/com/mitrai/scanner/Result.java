@@ -20,7 +20,7 @@ public class Result implements Serializable {
     private List<FinalLineItem> OCRLineItemList;
     private List<FinalLineItem> ManualLineItemList;
     private OCRStats ocrStats;
-    private String[] rawData;
+    private List<String[]> rawDataList;
 
     public Result(String id) {
         this.id = id;
@@ -74,12 +74,12 @@ public class Result implements Serializable {
         this.ManualLineItemList = manualLineItemList;
     }
 
-    public String[] getRawData() {
-        return rawData;
+    public List<String[]> getRawDataList() {
+        return rawDataList;
     }
 
-    public void setRawData(String[] rawData) {
-        this.rawData = rawData;
+    public void setRawDataList(List<String[]> rawDataList) {
+        this.rawDataList = rawDataList;
     }
 
     public String getSuperMarketName() {

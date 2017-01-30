@@ -70,7 +70,13 @@ public class OCRCronService {
                     }
 
                     highReceipt = TemplateEngine.removeAppostrofeFromLineItems(highReceipt);
-                    result.setRawData(highReceipt.getRawData());
+
+                    // setting raw data to result
+                    List<String[]> rawDataList = new ArrayList<>();
+                    for (Receipt r : receiptList) {
+                        rawDataList.add(r.getRawData());
+                    }
+                    result.setRawDataList(rawDataList);
 
                     masterReceipt.setLineItemList(highReceipt.getLineItems());
 
@@ -78,7 +84,7 @@ public class OCRCronService {
                     DataServiceImpl.insertLineItemsIntoDB(highReceipt);
                     DataServiceImpl.insertRawDataIntoDB(highReceipt);
 
-                    doFullTextSearchForReceiptTotal(result);
+                    doFullTextSearchForReceiptTotal(result, superMarketBrand);
                     removeUnwantedOccurrencesFromReceipt(highReceipt);
 
                     List<ManualReceiptLineItem> selectedManualReceiptLineItemList = new ArrayList<>();
@@ -125,9 +131,24 @@ public class OCRCronService {
                     if (manualTescoReceiptList.size() != 0 && manualSainsReceiptList.size() != 0) {
                         System.out.println("Manual record data not found for this file name cannot compare accuracy");
                         result.setStatus("NO MANUAL RECORD FOUND FOR ACCURACY CHECK");
-                        DataServiceImpl.insertBatchProcessDetails(result);
+                        List<LineItem> lineItemList = highReceipt.getFullTextPredictedLineItems();
+                        for (LineItem item : highReceipt.getPossibleLineItems()) {
+                            lineItemList.add(item);
+                        }
+
+                        List<FinalLineItem> finalLineItemList = new ArrayList<>();
+                        for (LineItem item : lineItemList) {
+                            FinalLineItem finalLineItem = new FinalLineItem();
+                            finalLineItem.setDescription(item.getDescription());
+                            finalLineItem.setValue(item.getValue());
+                            finalLineItem.setLineNumber(item.getLineNumber());
+                            finalLineItemList.add(finalLineItem);
+                        }
+
+                        result.setOCRLineItemList(finalLineItemList);
 
                         // TODO format text and save to DB
+                        DataServiceImpl.insertBatchProcessDetails(result);
 
                         continue;
                     } else if (manualTescoReceiptList.size() != 0) {
@@ -138,10 +159,11 @@ public class OCRCronService {
 
                     result.setManualLineItemList(Utils.getManualFinalLineItemList(selectedManualReceiptLineItemList));
                     ScoreSummary scoreSummary = new ScoreSummary();
+                    String receiptTotal = new String(selectedManualReceiptLineItemList.get(0).getTILLROLL_RECORDED_SPEND());
 
                     AccuracyTest.verifySuperMarketBrand(scoreSummary, masterReceipt.getSuperMarketName(), selectedManualReceiptLineItemList);
                     AccuracyTest.verifyLineItems(scoreSummary, ocrStats, highReceipt, selectedManualReceiptLineItemList, result);
-                    AccuracyTest.verifyReceiptTotalScore(scoreSummary);
+                    AccuracyTest.verifyReceiptTotalScore(result, scoreSummary, receiptTotal);
                     AccuracyTest.calculateFinalScore(scoreSummary);
 
                     result.setScoreSummary(scoreSummary);
@@ -156,6 +178,7 @@ public class OCRCronService {
     }
 
     public static void removeUnwantedOccurrencesFromReceipt(Receipt receipt) throws UnknownHostException {
+
         String[] totalArray = {"Total" , "sub total"};
         List<LineItem> lineItemsWithTotal = new ArrayList<>();
         // Data cleaning to remove total string occurrences
@@ -183,15 +206,27 @@ public class OCRCronService {
         }
     }
 
-    public static void doFullTextSearchForReceiptTotal(Result result) throws UnknownHostException {
+    public static void doFullTextSearchForReceiptTotal(Result result, String superMarketName) throws UnknownHostException {
 
         // get the total of the receipt
         // If the super market name is tesco
         LineItem totalLineItem = DataServiceImpl.doFullTextSearchForLineItem("TOTAL TO PAY", "rawData");
         // score 1.2
         // TODO refactor this method
-        if (totalLineItem != null && (1.2 < totalLineItem.getScore())) {
+        setReceiptTotal(result,totalLineItem,superMarketName);
+
+        if (superMarketName.equalsIgnoreCase(Configs.SAINSBURY_BRAND_NAME)) {
+            totalLineItem = DataServiceImpl.doFullTextSearchForLineItem("BALANCE DUE", "rawData");
+            setReceiptTotal(result,totalLineItem, superMarketName);
+        }
+    }
+
+    public static void setReceiptTotal(Result result, LineItem totalLineItem, String superMarketName) {
+        if (totalLineItem != null && (1.2 <= totalLineItem.getScore())) {
             boolean totalValueFound = StringHelper.regexForDescWithNumbersAndPeriod(totalLineItem);
+            if (superMarketName.equalsIgnoreCase(Configs.SAINSBURY_BRAND_NAME)) {
+                totalValueFound = StringHelper.regexForCurrencySymbolAndDecimals(totalLineItem);
+            }
             if (!totalValueFound) {
                 if (StringHelper.regexForDescWithNumbersOnly(totalLineItem)) {
                     result.setReceiptTotal(totalLineItem.getValue());

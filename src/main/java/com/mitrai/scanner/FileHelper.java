@@ -34,7 +34,7 @@ public class FileHelper {
     public static boolean isProd = false;
 
 
-    public static int maxRandomFileCount = 10;
+    public static int maxRandomFileCount = 20;
 
     static {
         Properties properties = Configs.getConfigs(Configs.CONFIG_FILE_NAME);

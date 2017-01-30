@@ -81,4 +81,12 @@ public class ManualReceiptLineItem implements Serializable {
     public void setRecordID(int recordID) {
         this.recordID = recordID;
     }
+
+    public String getTILLROLL_RECORDED_SPEND() {
+        return TILLROLL_RECORDED_SPEND;
+    }
+
+    public void setTILLROLL_RECORDED_SPEND(String TILLROLL_RECORDED_SPEND) {
+        this.TILLROLL_RECORDED_SPEND = TILLROLL_RECORDED_SPEND;
+    }
 }
