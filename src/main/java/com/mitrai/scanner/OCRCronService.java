@@ -128,7 +128,7 @@ public class OCRCronService {
                     List<ManualReceiptLineItem> manualTescoReceiptList = DataServiceImpl.getReceiptFromManualData(fileNameWithoutExtension, DataServiceImpl.manualDataTescoCollection);
                     List<ManualReceiptLineItem> manualSainsReceiptList = DataServiceImpl.getReceiptFromManualData(fileNameWithoutExtension, DataServiceImpl.manualDataSaintsCollection);
 
-                    if (manualTescoReceiptList.size() != 0 && manualSainsReceiptList.size() != 0) {
+                    if (manualTescoReceiptList.size() == 0 && manualSainsReceiptList.size() == 0) {
                         System.out.println("Manual record data not found for this file name cannot compare accuracy");
                         result.setStatus("NO MANUAL RECORD FOUND FOR ACCURACY CHECK");
                         List<LineItem> lineItemList = highReceipt.getFullTextPredictedLineItems();

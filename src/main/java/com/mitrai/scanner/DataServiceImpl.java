@@ -19,6 +19,7 @@ import java.util.Properties;
  */
 public class DataServiceImpl {
 
+    public static String dataLakeDB;
     public static String manualDataDB;
     public static String manualDataTescoCollection;
     public static String manualDataSaintsCollection;
@@ -34,6 +35,7 @@ public class DataServiceImpl {
 
     static {
         Properties properties = Configs.getConfigs(Configs.DB_CONFIG_FILE_NAME);
+        dataLakeDB = properties.getProperty("dataLakeDbName");
         manualDataDB = properties.getProperty("manualDataDbName");
         manualDataTescoCollection = properties.getProperty("manualTescoReceiptCollection");
         manualDataSaintsCollection = properties.getProperty("manualSaintsReceiptCollection");
@@ -146,7 +148,7 @@ public class DataServiceImpl {
 
     public static List<ManualReceiptLineItem> doFullTextSearchFromManualData(String searchTerm, String collectionName) throws UnknownHostException {
         MongoClient mongo = new MongoClient(localhost, port);
-        DB db = mongo.getDB(manualDataDB);
+        DB db = mongo.getDB(dataLakeDB);
         DBCollection col = db.getCollection(collectionName);
 
         DBObject search = new BasicDBObject("$text", new BasicDBObject("$search", searchTerm));

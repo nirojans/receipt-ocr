@@ -1,5 +1,6 @@
 package com.mitrai.scanner;
 
+import com.mitrai.scanner.receipt.FinalLineItem;
 import com.mitrai.scanner.score.LineScore;
 import com.mitrai.scanner.score.ScoreSummary;
 
@@ -30,7 +31,7 @@ public class AccuracyTest implements Cloneable {
             lineScorePoint.setDesc(String.valueOf(descriptionAccuracyArray[i]));
             lineScorePoint.setValue(String.valueOf(valueAccuracyArray[i]));
 
-            lineScorePoint.setTotalScore(String.valueOf((int)lineItemWeightedScore));
+            lineScorePoint.setTotalScore(String.valueOf((int)lineItemScore));
             lineScoreList.add(lineScorePoint);
         }
 
@@ -192,7 +193,6 @@ public class AccuracyTest implements Cloneable {
         }
 
 
-        // TODO convert possible line items through the manual data set
         List<LineItem> possibleLineItemList = receipt.getPossibleLineItems();
 
         for(int i=0; i< possibleLineItemList.size(); i++) {
@@ -262,6 +262,10 @@ public class AccuracyTest implements Cloneable {
         ocrStats.setUnclassifiedManualLineItem(Utils.setUnClassifiedManualData(manualLineItemsList));
         ocrStats.setUnclassifiedOCRLineItem(Utils.setUnClassifiedOCRData(unIdentifiedLineItemList));
 
+        for (LineItem item : unIdentifiedLineItemList) {
+            identifiedLineItemList.add(item);
+        }
+
         result.setOCRLineItemList(Utils.getOCRFinalLineItemListAfterAccuracyCheck(identifiedLineItemList));
 
         return ocrStats;
@@ -272,10 +276,10 @@ public class AccuracyTest implements Cloneable {
         String[] array = new String[finalLineItems.size()];
         for (int i=0; i< finalLineItems.size(); i++) {
             LineItem item = finalLineItems.get(i);
-            String desc = "Desc : " + item.getDescription() + " | " + item.getManualDataDescription() + " | " +
-                    String.valueOf(item.getDescriptionAccuracyPercentage()) + " |||| ";
-            String value = "Value : " + item.getValue() + " | " + item.getManualDataValue() + " | " + String.valueOf(item.getValueAccuracyPercentage());
-            array[i] = desc + value;
+            String desc = "ocr : " + item.getDescription() + " | " + item.getValue()  + " || ";
+            String value = "manual : " + item.getManualDataDescription() + " | " + item.getManualDataValue() + " || ";
+            String accuracy = "accuracy : desc : " + String.valueOf(item.getDescriptionAccuracyPercentage())  + "% | val : " + String.valueOf(item.getValueAccuracyPercentage()) + "%";
+            array[i] = desc + value + accuracy;
         }
         return array;
     }

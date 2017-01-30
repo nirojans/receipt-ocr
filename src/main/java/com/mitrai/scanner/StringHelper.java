@@ -125,7 +125,20 @@ public class StringHelper {
         }
         receipt.setLineItems(lineItemList);
         receipt.setUnclassifiedLineItemNumbers(integerList);
-        receipt.setPossibleLineItems(possibleLineItems);
+        List<LineItem> finalPossibleLineItem = new ArrayList<>();
+
+        for (int j=0; j<possibleLineItems.size(); j++) {
+            LineItem item = possibleLineItems.get(j);
+            int start = receipt.getLineItemStartLine();
+            int end = receipt.getLineItemEndLine();
+
+            if (start < item.getLineNumber() && item.getLineNumber() < end) {
+                finalPossibleLineItem.add(item);
+            }
+        }
+
+        receipt.setPossibleLineItems(finalPossibleLineItem);
+
         return receipt;
     }
 
