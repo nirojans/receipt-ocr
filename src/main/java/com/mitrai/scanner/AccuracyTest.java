@@ -68,6 +68,10 @@ public class AccuracyTest implements Cloneable {
         return scoreSummary;
     }
 
+    public static void verifyReceiptTotal(Result result, ManualReceiptLineItem lineItem) {
+
+    }
+
     public static LineItem identifyAndRemoveFromManualList(List<ManualReceiptLineItem> manualReceiptLineItemList, LineItem lineItem) {
 
         Map<Integer, Integer> lineItemScoreMap = new HashMap<>();

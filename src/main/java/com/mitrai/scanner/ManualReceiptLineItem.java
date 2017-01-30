@@ -14,6 +14,7 @@ public class ManualReceiptLineItem implements Serializable {
     private String QUANTITY;
     private String PERIOD_YEAR;
     private String LINE_PRICE;
+    private String TILLROLL_RECORDED_SPEND;
 
     private double score;
 

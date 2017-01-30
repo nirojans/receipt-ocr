@@ -135,7 +135,7 @@ public class FileHelper {
                 receiptList.add(receipt);
             }
         } catch (Exception e) {
-            System.out.println("File not found for the OCR's results");
+//            System.out.println("File not found for the OCR's results");
         }
         return receiptList;
     }
