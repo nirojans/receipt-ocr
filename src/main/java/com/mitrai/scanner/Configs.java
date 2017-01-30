@@ -26,6 +26,8 @@ public class Configs {
     public static final String DB_CONFIG_FILE_NAME = "db.properties";
     public static final String SUPER_MARKET_TEMPLATE_NAME = "template.properties";
 
+    public static String remove_from_data_lake = "true";
+
     public static String TESCO_BRAND_NAME;
     public static String SAINSBURY_BRAND_NAME;
 
@@ -37,6 +39,7 @@ public class Configs {
         Properties scoreProperties = Configs.getConfigs(Configs.SCORE_FILE_NAME);
 
         maxFileSize = Integer.parseInt(properties.getProperty("max_file_size"));
+        remove_from_data_lake = properties.getProperty("remove_from_data_lake");
         moveToArchiveStatus = properties.getProperty("move_images_to_archive_after_processing");
 
         TESCO_BRAND_NAME = properties.getProperty("tesco_brand_name");

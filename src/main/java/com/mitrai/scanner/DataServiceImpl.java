@@ -151,6 +151,15 @@ public class DataServiceImpl {
         DB db = mongo.getDB(dataLakeDB);
         DBCollection col = db.getCollection(collectionName);
 
+        // check if a document exists, If exists remove
+        if (Configs.remove_from_data_lake.equalsIgnoreCase("true")) {
+            if (isRecordExists(col, "TILLROLL_DOC_ID", OCRCronService.id)) {
+                BasicDBObject document = new BasicDBObject();
+                document.put("TILLROLL_DOC_ID", OCRCronService.id);
+                col.remove(document);
+            }
+        }
+
         DBObject search = new BasicDBObject("$text", new BasicDBObject("$search", searchTerm));
         DBObject project = new BasicDBObject("score", new BasicDBObject("$meta", "textScore"));
         DBObject sorting = new BasicDBObject("score", new BasicDBObject("$meta", "textScore"));

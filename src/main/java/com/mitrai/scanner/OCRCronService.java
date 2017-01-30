@@ -17,6 +17,8 @@ import java.util.List;
  */
 public class OCRCronService {
 
+    public static String id = "";
+
     public void startDoingBatchProcessing() throws IOException, InterruptedException {
 //        FileUtils.deleteDirectory(new File(FileHelper.baseFolder));
 
@@ -38,13 +40,15 @@ public class OCRCronService {
                 if (extensionName.equalsIgnoreCase("jpeg") || extensionName.equalsIgnoreCase("jpg") || extensionName.equalsIgnoreCase("png")
                         || extensionName.equalsIgnoreCase("tif") || extensionName.equalsIgnoreCase("tiff")) {
 
+                    id = fileNameWithoutExtension;
+
                     System.out.printf("started processing file : " + fileNameWithExtension);
                     List<Receipt> receiptList = performOCRBasedOnProdOrDev(fileNameWithExtension, fileNameWithoutExtension);
                     OCRStats ocrStats = new OCRStats(fileNameWithoutExtension);
                     // read all text
                     receiptList = FileHelper.readAllResultsForAImage(fileNameWithoutExtension);
 
-                    Result result = new Result(fileNameWithExtension);
+                    Result result = new Result(fileNameWithoutExtension);
 
                     if (receiptList.size() == 0) {
                         result.setStatus(Configs.CANNOT_PROCESS);
