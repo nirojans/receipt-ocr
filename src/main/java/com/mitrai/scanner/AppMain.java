@@ -11,6 +11,7 @@ public class AppMain {
 
     public static void main(String[] args) throws Exception {
         System.out.printf("Starting the main application");
+//        Test.copyRandomFilesToRawFolder();
         cronJob();
     }
 
